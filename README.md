@@ -27,9 +27,32 @@ delivered in ping payload.
 
 ## Build instructions
 
-Compile using MingW compiler from msys2 distribution. Preferred IDE is CLion.
+### CLion IDE
+
+Compile using MingW compiler toolchain from msys2 distribution from CLion IDE.
+It just works.
 
 Compiled artifacts will be found in `cmake-build-*/bin` folder.
+
+### From shell
+
+This is rather involved and messy, but if you absolutely insist on not using CLion:
+
+1. Install [msys2](http://msys2.org/)
+2. Install [CMake](https://cmake.org/download/) (one from msys2 repositories wont work)
+3. Open cmd.exe and run `cmake -G 'MinGW Makefiles' path/to/source/code`
+4. Open msys2 shell and run `mingw32-make`
+
+### Why MinGW?
+
+As you probably have noticed using MinGW on Windows is something of a drama. Reason
+for using this compiler is because produced binaries link directly to msvcrt.dll
+and run on a very wide range of Windows' versions. Downside is a rahter bumpy
+build process, excessive other dependencies and binary size. These issues were
+addressed by tweaking compiler parameters and using `tinystl` instead of standard
+stl bundled with the compiler. MSVC may produce bit smaller binaries, but making
+them run on a very wide array of Windows' versions while linking to msvcrt.dll
+is an uphill battle.
 
 ## Instructions
 
