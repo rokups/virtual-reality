@@ -26,6 +26,7 @@
 #include "../shared/debug.h"
 #include "../shared/win32.h"
 #include "../shared/process_hollowing.h"
+#include "../shared/math.h"
 #include "context.h"
 
 
@@ -34,6 +35,17 @@ void imgur_thread(context& ctx);
 
 int main()
 {
+    // Single instance mutex
+    HANDLE hMutex = nullptr;
+    {
+        stl::string vr_mutex = "Global\\" + deterministic_uuid(vr_shared_key + vr_mutant_main_instance);
+        hMutex = OpenMutexA(MUTEX_ALL_ACCESS, FALSE, vr_mutex.c_str());
+        if (!hMutex)
+            hMutex = CreateMutexA(nullptr, 0, vr_mutex.c_str());
+        else
+            return 0;
+    }
+
     WSADATA wsa{};
     WSAStartup(0x0202, &wsa);
 
@@ -47,4 +59,5 @@ int main()
     coro_run();
 
     WSACleanup();
+    ReleaseMutex(hMutex);
 }

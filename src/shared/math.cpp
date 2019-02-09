@@ -21,15 +21,44 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-#include <cstdint>
-#include <cstdlib>
-#include <cassert>
+#include <stdint.h>
+#include <stdlib.h>
+#include <assert.h>
 #include "math.h"
+#include "rc4.h"
 
-int Random(int min, int max)
+int random(int min, int max)
 {
     auto range = max - min;
     assert(range > 0);
     float random = ((float)(rand() + rand())) / (RAND_MAX + RAND_MAX);
     return static_cast<int>(random * range + min);
+}
+
+stl::string deterministic_uuid(uint64_t seed)
+{
+    uint32_t a = 0;
+    uint16_t b = 0;
+    uint16_t c = 0;
+    uint16_t d = 0;
+    uint32_t e = 0;
+    uint16_t f = 0;
+
+    rc4_ctx rc4{};
+    rc4_init(&rc4, seed);
+
+    rc4_xor(&rc4, (uint8_t*)&a, sizeof(a));
+    rc4_xor(&rc4, (uint8_t*)&b, sizeof(b));
+    rc4_xor(&rc4, (uint8_t*)&c, sizeof(c));
+    rc4_xor(&rc4, (uint8_t*)&d, sizeof(d));
+    rc4_xor(&rc4, (uint8_t*)&e, sizeof(e));
+    rc4_xor(&rc4, (uint8_t*)&f, sizeof(f));
+
+    c &= 0xfff; // Clear first digit so it can be always 4. Lets pretend its uuid4.
+
+    stl::string result;
+    result.resize(43);
+    snprintf(&result.at(0), result.size(), "{%08X-%04X-4%03X-%04X-%08X-%04X}", a, b, c, d, e, f);
+
+    return result;
 }

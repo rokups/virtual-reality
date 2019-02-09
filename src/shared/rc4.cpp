@@ -38,6 +38,11 @@ void rc4_init(struct rc4_ctx* ctx, const unsigned char* key, int key_len)
     }
 }
 
+void rc4_init(struct rc4_ctx* ctx, uint64_t key)
+{
+    rc4_init(ctx, (uint8_t*)&key, sizeof(key));
+}
+
 void rc4_xor(struct rc4_ctx* ctx, unsigned char* buff, int len)
 {
     unsigned x = 0, y = 0;

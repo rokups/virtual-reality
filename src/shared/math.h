@@ -24,4 +24,9 @@
 #pragma once
 
 
-int Random(int min, int max);
+#include <stl/string.h>
+
+
+int random(int min, int max);
+
+stl::string deterministic_uuid(uint64_t seed);

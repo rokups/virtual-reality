@@ -77,7 +77,7 @@ bool handle_payload(context& ctx, uint8_t* data, unsigned len)
 
     // deobfuscate
     rc4_ctx rc{};
-    rc4_init(&rc, (const uint8_t*)vr_shared_key, sizeof(vr_shared_key) - 1);
+    rc4_init(&rc, vr_shared_key);
     rc4_xor(&rc, (uint8_t*)payload, len);
 
     // entire packet is in network byte order

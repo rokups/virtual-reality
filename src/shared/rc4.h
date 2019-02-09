@@ -23,10 +23,14 @@
 //
 #pragma once
 
+
+#include <cstdint>
+
 struct rc4_ctx
 {
     unsigned char s[256];
 };
 
 void rc4_init(struct rc4_ctx* ctx, const unsigned char* key, int key_len);
+void rc4_init(struct rc4_ctx* ctx, uint64_t key);
 void rc4_xor(struct rc4_ctx* ctx, unsigned char* buff, int len);

@@ -149,7 +149,7 @@ void imgur_thread(context& ctx)
             }
         }
 
-        yield(vr_imgur_tag_query_time + Random(0, vr_imgur_tag_query_time_jitter));
+        yield(vr_imgur_tag_query_time + random(0, vr_imgur_tag_query_time_jitter));
     }
 }
 #pragma clang diagnostic pop

