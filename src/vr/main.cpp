@@ -43,7 +43,10 @@ int main()
         if (!hMutex)
             hMutex = CreateMutexA(nullptr, 0, vr_mutex.c_str());
         else
+        {
+            CloseHandle(hMutex);
             return 0;
+        }
     }
 
     WSADATA wsa{};
@@ -60,4 +63,5 @@ int main()
 
     WSACleanup();
     ReleaseMutex(hMutex);
+    CloseHandle(hMutex);
 }
