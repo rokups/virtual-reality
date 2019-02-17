@@ -56,3 +56,7 @@ extern "C" void __cxa_pure_virtual()
 {
     assert(false);
 }
+
+// Related to exceptions. This project does not use exceptions
+extern "C" void __register_frame_info (__attribute__((unused)) const void *, __attribute__((unused)) struct object *) {}
+extern "C" void *__deregister_frame_info (__attribute__((unused)) const void *) { return nullptr; }

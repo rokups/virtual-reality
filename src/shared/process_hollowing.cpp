@@ -96,7 +96,7 @@ PROCESS_INFORMATION hollow_process(void* image, const char* host, hollow_process
 #ifdef _M_X64
     auto* peb = (PPEB)ctx.Rdx;
 #else
-    auto* peb = (PPEB*)ctx.Ebx;
+    auto* peb = (PPEB)ctx.Ebx;
 #endif
 
     PVOID pBase = nullptr;
