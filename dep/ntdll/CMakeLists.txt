@@ -28,7 +28,7 @@ else ()
     set (NTDLL_ARCH_SUFFIX 64)
 endif ()
 add_custom_target(libntdll
-    COMMAND dlltool -d ${CMAKE_CURRENT_SOURCE_DIR}/ntdll${NTDLL_ARCH_SUFFIX}.def
+    COMMAND dlltool -k -d ${CMAKE_CURRENT_SOURCE_DIR}/ntdll${NTDLL_ARCH_SUFFIX}.def
             -l ${CMAKE_BINARY_DIR}/libntdll${NTDLL_ARCH_SUFFIX}.a
 )
 

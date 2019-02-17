@@ -8,5 +8,5 @@ msvc:
 	del /q ntdll64.exp
 
 mingw:
-	dlltool -d ntdll86.def -l libntdll86.a
+	dlltool -d ntdll86.def -l libntdll86.a -k
 	dlltool -d ntdll64.def -l libntdll64.a
