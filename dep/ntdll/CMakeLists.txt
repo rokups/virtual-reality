@@ -22,6 +22,17 @@
 # DEALINGS IN THE SOFTWARE.
 #
 
-execute_process(COMMAND dlltool -d ${CMAKE_CURRENT_SOURCE_DIR}/ntdll.def -l ${CMAKE_BINARY_DIR}/libntdll.a)
+if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set (NTDLL_ARCH_SUFFIX 86)
+else ()
+    set (NTDLL_ARCH_SUFFIX 64)
+endif ()
+add_custom_target(libntdll
+    COMMAND dlltool -d ${CMAKE_CURRENT_SOURCE_DIR}/ntdll${NTDLL_ARCH_SUFFIX}.def
+            -l ${CMAKE_BINARY_DIR}/libntdll${NTDLL_ARCH_SUFFIX}.a
+)
+
 add_library(ntdll INTERFACE)
 target_include_directories(ntdll INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+add_dependencies(ntdll libntdll)
+target_link_libraries(ntdll INTERFACE ${CMAKE_BINARY_DIR}/libntdll${NTDLL_ARCH_SUFFIX}.a)

@@ -1,9 +1,10 @@
 /*
 	ntdll.h
 	User Mode, 32bit & 64bit version
-	Visual Studio 6.0 - Visual Studio 2010 compatible
+	Visual Studio 6.0 - Visual Studio 2010 and MingW compatible
 	Intel C++ Compiler (ICL) 11.x - 12.x prefered
 
+	(c) 2019 - Rokas Kupstys
 	(c) 2009, 2010, 2011 - Fyyre
 	(c) 2011 - 2012 EP_X0FF
 	(c) 2011 - rndbit
@@ -527,7 +528,8 @@ typedef struct _OBJECT_DIRECTORY_INFORMATION {
     UNICODE_STRING TypeName;
 } OBJECT_DIRECTORY_INFORMATION, *POBJECT_DIRECTORY_INFORMATION;
 
-#if defined(_WINNT_) && (_MSC_VER < 1300)
+#if defined(_WINNT_) && (_MSC_VER < 1300) && !defined(___PROCESSOR_NUMBER_DEFINED)
+#define ___PROCESSOR_NUMBER_DEFINED
 typedef struct _PROCESSOR_NUMBER {
 	WORD Group;
 	BYTE Number;
@@ -5882,10 +5884,6 @@ typedef struct _PORT_DATA_INFORMATION {
 	PORT_DATA_ENTRY DataEntries[1];
 } PORT_DATA_INFORMATION, *PPORT_DATA_INFORMATION;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 	//
 	// csrss & csrsrv related
 	//
@@ -5999,10 +5997,6 @@ typedef struct _CSR_CALLBACK_INFO
 	ULONG MaxApiNumber;
 	PCSR_CALLBACK_ROUTINE *CallbackDispatchTable;
 } CSR_CALLBACK_INFO, *PCSR_CALLBACK_INFO;
-
-#ifdef __cplusplus
-}
-#endif
 
 // end csrss
 
@@ -8630,10 +8624,6 @@ NTSTATUS
 LsaLookupFreeMemory(
 	IN PVOID Buffer
 	);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // _LSALOOKUP_
 
@@ -11459,10 +11449,6 @@ RtlGetIntegerAtom(
 	OUT OPTIONAL PUSHORT IntegerAtom
 	);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define EVENT_MIN_LEVEL                      (0)
 #define EVENT_MAX_LEVEL                      (0xff)
 
@@ -11511,11 +11497,6 @@ extern "C" {
 		ULONG       Size;
 		ULONG       Type;
 	} EVENT_FILTER_DESCRIPTOR, *PEVENT_FILTER_DESCRIPTOR;
-
-#ifdef __cplusplus
-}
-#endif
-
 
 //
 // old nt4 channel stuff
@@ -11654,10 +11635,6 @@ typedef union _SLIST_HEADER {
 //
 // prototypes *must* be encapsulated with extern "C" macros at start and end of prototype block
 //
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 PSLIST_ENTRY
 __fastcall

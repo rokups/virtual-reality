@@ -25,4 +25,4 @@
 file(GLOB_RECURSE SOURCE_FILES *.c *.cpp *.h *.hpp)
 add_library(shared STATIC ${SOURCE_FILES} math.cpp math.h)
 target_compile_options(shared PRIVATE -Wno-multichar)
-target_link_libraries(shared PUBLIC mini-gzip miniz ntdll picopng tinystl crypt32 winhttp ${CMAKE_BINARY_DIR}/libntdll.a)
+target_link_libraries(shared PUBLIC mini-gzip miniz ntdll picopng tinystl crypt32 winhttp)
