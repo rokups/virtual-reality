@@ -78,11 +78,11 @@ void coroutine_loop::run()
         _starting.clear();
 
         // Sort runnables by next run time. Runners to front, sleepers to back.
-        std::sort(_runnables.begin(), _runnables.end(), [](coro_ctx* a, coro_ctx* b) {
-            unsigned a_slept = GetTickCount() - a->last_run;
-            unsigned b_slept = GetTickCount() - b->last_run;
-            return (a->sleep - a_slept) < (b->sleep - b_slept);
-        });
+        // std::sort(_runnables.begin(), _runnables.end(), [](coro_ctx* a, coro_ctx* b) {
+        //     unsigned a_slept = GetTickCount() - a->last_run;
+        //     unsigned b_slept = GetTickCount() - b->last_run;
+        //     return (a->sleep - a_slept) < (b->sleep - b_slept);
+        // });
 
         int sleep_time = INT_MAX;
         for (auto it = _runnables.begin(); it != _runnables.end();)
@@ -116,7 +116,7 @@ void coroutine_loop::run()
             else
             {
                 sleep_time = std::min(sleep_time, time_left_to_sleep);
-                break;
+                ++it;
             }
         }
         Sleep((unsigned)sleep_time);
