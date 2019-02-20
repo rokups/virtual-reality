@@ -35,6 +35,8 @@ int random(int min, int max)
     return static_cast<int>(random * range + min);
 }
 
+uint64_t deterministic_uuid_seed = 0;
+
 stl::string deterministic_uuid(uint64_t seed)
 {
     uint32_t a = 0;
@@ -45,7 +47,7 @@ stl::string deterministic_uuid(uint64_t seed)
     uint16_t f = 0;
 
     rc4_ctx rc4{};
-    rc4_init(&rc4, seed);
+    rc4_init(&rc4, deterministic_uuid_seed + seed);
 
     rc4_xor(&rc4, (uint8_t*)&a, sizeof(a));
     rc4_xor(&rc4, (uint8_t*)&b, sizeof(b));
