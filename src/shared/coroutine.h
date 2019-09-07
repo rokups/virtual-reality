@@ -32,36 +32,36 @@ typedef stl::function<void()> coro_func;
 
 class coroutine_loop
 {
-	void* _main_fiber;
-	unsigned int _sleep;
-	bool _terminating;
+    void* _main_fiber;
+    unsigned int _sleep;
+    bool _terminating;
 
-	static unsigned CALLBACK _run_coro_func(void*);
+    static unsigned CALLBACK _run_coro_func(void*);
 
-	struct coro_ctx
-	{
-		void* this_fiber = nullptr;
+    struct coro_ctx
+    {
+        void* this_fiber = nullptr;
         coro_func func{};
-		unsigned sleep = 0;
-		unsigned last_run = GetTickCount();
-	};
+        unsigned sleep = 0;
+        unsigned last_run = GetTickCount();
+    };
 
 public:
     coroutine_loop();
     static void activate(coroutine_loop& loop);
     void* get_main_fiber(unsigned int ms = 0);
-	void start(const coro_func& coro, unsigned stack_size = 1024 * 32);
+    void start(const coro_func& coro, unsigned stack_size = 1024 * 32);
     void stop_all() { _terminating = true; }
-	bool is_active() const { return !_terminating; }
+    bool is_active() const { return !_terminating; }
     coro_ctx* get_current_coro() { return _current; }
     void run();
 
     static coroutine_loop* current_loop;
 
 protected:
-	stl::vector<coro_ctx*> _runnables;
-	stl::vector<coro_ctx*> _starting;
-	coro_ctx* _current = nullptr;
+    stl::vector<coro_ctx*> _runnables;
+    stl::vector<coro_ctx*> _starting;
+    coro_ctx* _current = nullptr;
 };
 
 inline bool yield(unsigned sleepMs = 0) { SwitchToFiber(coroutine_loop::current_loop->get_main_fiber(sleepMs)); return coroutine_loop::current_loop->is_active(); }

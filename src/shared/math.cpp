@@ -21,11 +21,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
+#include <windows.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
 #include "math.h"
 #include "rc4.h"
+#include "../config.h"
+
+uint64_t deterministic_uuid_seed;
 
 int random(int min, int max)
 {
@@ -35,7 +39,31 @@ int random(int min, int max)
     return static_cast<int>(random * range + min);
 }
 
-uint64_t deterministic_uuid_seed = 0;
+uint64_t get_machine_hash()
+{
+    // Use unique per-machine GUID to seed generation of deterministic GUIDs to make them unique on each machine.
+    uint64_t machine_hash = vr_shared_key;
+    HKEY hKey = nullptr;
+    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Cryptography", 0, KEY_QUERY_VALUE|KEY_WOW64_64KEY, &hKey) == ERROR_SUCCESS)
+    {
+        union
+        {
+            char machine_guid[40];
+            uint64_t n[5];
+        } u{};
+        DWORD guid_size = sizeof(u.machine_guid);
+        DWORD key_type = REG_SZ;
+        if (RegQueryValueExA(hKey, "MachineGuid", nullptr, &key_type, (LPBYTE)u.machine_guid, &guid_size) == ERROR_SUCCESS)
+        {
+            for (uint64_t k : u.n)
+                machine_hash ^= k;
+        }
+        RegCloseKey(hKey);
+        hKey = nullptr;
+    }
+
+    return machine_hash;
+}
 
 stl::string deterministic_uuid(uint64_t seed)
 {

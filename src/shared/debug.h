@@ -37,13 +37,13 @@ void debug_log(const char* format, DebugLevel lvl, const char* file, unsigned li
 void debug_log(const wchar_t* format, DebugLevel lvl, const char* file, unsigned line, ...);
 
 #if _DEBUG
-#	define LOG_CRITICAL(format, ...)	debug_log(format, DebugLevel::Critical, __FILE__, __LINE__, ##__VA_ARGS__)
-#	define LOG_ERROR(format, ...)		debug_log(format, DebugLevel::Error, __FILE__, __LINE__, ##__VA_ARGS__)
-#	define LOG_WARNING(format, ...)		debug_log(format, DebugLevel::Warning, __FILE__, __LINE__, ##__VA_ARGS__)
-#	define LOG_DEBUG(format, ...)		debug_log(format, DebugLevel::Debug, __FILE__, __LINE__, ##__VA_ARGS__)
+#   define LOG_CRITICAL(format, ...)    debug_log(format, DebugLevel::Critical, __FILE__, __LINE__, ##__VA_ARGS__)
+#   define LOG_ERROR(format, ...)        debug_log(format, DebugLevel::Error, __FILE__, __LINE__, ##__VA_ARGS__)
+#   define LOG_WARNING(format, ...)        debug_log(format, DebugLevel::Warning, __FILE__, __LINE__, ##__VA_ARGS__)
+#   define LOG_DEBUG(format, ...)        debug_log(format, DebugLevel::Debug, __FILE__, __LINE__, ##__VA_ARGS__)
 #else
-#	define LOG_CRITICAL(...)	(void)0
-#	define LOG_ERROR(...)		(void)0
-#	define LOG_WARNING(...)		(void)0
-#	define LOG_DEBUG(...)		(void)0
+#   define LOG_CRITICAL(...)    (void)0
+#   define LOG_ERROR(...)        (void)0
+#   define LOG_WARNING(...)        (void)0
+#   define LOG_DEBUG(...)        (void)0
 #endif

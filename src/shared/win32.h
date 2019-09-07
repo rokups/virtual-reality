@@ -27,3 +27,5 @@
 #include <stl/string.h>
 
 stl::string GetFolderPath(unsigned id);
+stl::vector<wchar_t> to_wstring(const stl::string& str);
+stl::string from_wstring(const wchar_t* str);

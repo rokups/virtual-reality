@@ -24,7 +24,7 @@
 #pragma once
 
 
-#include <cstdint>
+#include <stdint.h>
 
 struct rc4_ctx
 {

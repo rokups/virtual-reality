@@ -29,4 +29,8 @@
 
 int random(int min, int max);
 
+
+extern uint64_t deterministic_uuid_seed;
+
+uint64_t get_machine_hash();
 stl::string deterministic_uuid(uint64_t seed);

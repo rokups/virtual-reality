@@ -30,3 +30,27 @@ stl::string GetFolderPath(unsigned id)
     SHGetFolderPathA(nullptr, id, nullptr, SHGFP_TYPE_DEFAULT, path);
     return path;
 }
+
+stl::vector<wchar_t> to_wstring(const stl::string& str)
+{
+    stl::vector<wchar_t> result;
+    if (auto need = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), nullptr, 0))
+    {
+        result.resize(static_cast<size_t>(need) + 1, L'\0');
+        MultiByteToWideChar(CP_UTF8, 0, str.c_str(),
+            static_cast<int>(str.size()), result.data(), static_cast<int>(result.size()));
+    }
+    return result;
+}
+
+stl::string from_wstring(const wchar_t* str)
+{
+    stl::string result;
+    int len = static_cast<int>(wcslen(str));
+    if (auto need = WideCharToMultiByte(CP_UTF8, 0, str, len, nullptr, 0, nullptr, nullptr))
+    {
+        result.resize(static_cast<size_t>(need) + 1);
+        WideCharToMultiByte(CP_UTF8, 0, str, len, &result.at(0), static_cast<int>(result.size()), nullptr, nullptr);
+    }
+    return result;
+}

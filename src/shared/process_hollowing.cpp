@@ -105,7 +105,7 @@ PROCESS_INFORMATION hollow_process(void* image, const char* host, hollow_process
         LOG_ERROR("Could not read remote image base");
         return pi;
     }
-    //ZwUnmapViewOfSection( hNewProc, pBase );	// with this some processes stop working
+    //ZwUnmapViewOfSection( hNewProc, pBase );    // with this some processes stop working
 
     PVOID base = nullptr;
     SIZE_T entryPoint = 0;
@@ -220,13 +220,13 @@ PROCESS_INFORMATION hollow_process(void* image, const char* host, hollow_process
     ctx.EFlags = 0x3000;
 #else
     ctx.Eax = ctx.Eip = entryPoint;
-	ctx.SegGs = 0;
-	ctx.SegFs = 0x38;
-	ctx.SegEs = 0x20;
-	ctx.SegDs = 0x20;
-	ctx.SegSs = 0x20;
-	ctx.SegCs = 0x18;
-	ctx.EFlags = 0x3000;
+    ctx.SegGs = 0;
+    ctx.SegFs = 0x38;
+    ctx.SegEs = 0x20;
+    ctx.SegDs = 0x20;
+    ctx.SegSs = 0x20;
+    ctx.SegCs = 0x18;
+    ctx.EFlags = 0x3000;
 #endif
 
     if (FAILED(NtSetContextThread(pi.hThread, &ctx)))
