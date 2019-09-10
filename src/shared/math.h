@@ -23,14 +23,21 @@
 //
 #pragma once
 
-
-#include <stl/string.h>
-
-
-int random(int min, int max);
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern uint64_t deterministic_uuid_seed;
 
+int random(int min, int max);
 uint64_t get_machine_hash();
+void deterministic_uuid(uint64_t seed, char uuid[44]);
+
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+#include <stl/string.h>
 stl::string deterministic_uuid(uint64_t seed);
+#endif

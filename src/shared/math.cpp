@@ -29,6 +29,9 @@
 #include "rc4.h"
 #include "../config.h"
 
+extern "C"
+{
+
 uint64_t deterministic_uuid_seed;
 
 int random(int min, int max)
@@ -65,7 +68,7 @@ uint64_t get_machine_hash()
     return machine_hash;
 }
 
-stl::string deterministic_uuid(uint64_t seed)
+void deterministic_uuid(uint64_t seed, char uuid[44])
 {
     uint32_t a = 0;
     uint16_t b = 0;
@@ -86,9 +89,14 @@ stl::string deterministic_uuid(uint64_t seed)
 
     c &= 0xfff; // Clear first digit so it can be always 4. Lets pretend its uuid4.
 
-    stl::string result;
-    result.resize(43);
-    snprintf(&result.at(0), result.size(), "{%08X-%04X-4%03X-%04X-%08X-%04X}", a, b, c, d, e, f);
+    _snprintf(uuid, 44, "{%08X-%04X-4%03X-%04X-%08X-%04X}", a, b, c, d, e, f);
+}
 
-    return result;
+}
+
+stl::string deterministic_uuid(uint64_t seed)
+{
+    char uuid[44];
+    deterministic_uuid(seed, uuid);
+    return uuid;
 }

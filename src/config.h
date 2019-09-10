@@ -23,9 +23,11 @@
 //
 #pragma once
 
+#ifdef __cplusplus
 inline unsigned operator "" _sec(unsigned long long int n)  { return static_cast<unsigned int>(n * 1000); }
 inline unsigned operator "" _min(unsigned long long int n)  { return static_cast<unsigned int>(n * 60 * 1000); }
 inline unsigned operator "" _hour(unsigned long long int n) { return static_cast<unsigned int>(n * 60 * 60 * 1000); }
+#endif
 
 // 64bit integer. A key used for obfuscating various data.
 #define vr_shared_key 0x982147b5bea3f6c2ull
@@ -44,7 +46,4 @@ inline unsigned operator "" _hour(unsigned long long int n) { return static_cast
 
 
 // Private variables, do not modify.
-enum vr_mutants : unsigned long long
-{
-    vr_mutant_main_instance = 0x1000,
-};
+#define vr_mutant_main_instance 0x1000
