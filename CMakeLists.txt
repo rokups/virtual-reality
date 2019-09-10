@@ -40,31 +40,34 @@ if (NOT WIN32)
 endif ()
 
 if (MSVC)
-	# Disable buffer security checks
+    # Disable buffer security checks
     add_compile_options(/GS-)
-	# Disable exceptions
+    # Disable exceptions
     ucm_replace_flag(/EHs?c? /EHs-c- REGEX)
-	# Disable RTTI
+    # Disable RTTI
     ucm_replace_flag(/GR /GR-)
-	# Enable function level linking
+    # Enable function level linking
     add_compile_options(/Gy)
-	# Enable link time code generation a removal of unreferenced code
-	ucm_add_linker_flags(EXE SHARED MODULE /LTCG /OPT:REF)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    # Enable removal of unreferenced code
+    ucm_add_linker_flags(EXE SHARED MODULE /OPT:REF)
+    # Silence useless warnings
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_WINSOCK_DEPRECATED_NO_WARNINGS)
+    # Enable runtime code generation
+    ucm_add_flags(CONFIG Release MinSizeRel /RTCG)
 endif ()
 
 if (MINGW)
-    set (EXTRA_LINKER_FLAGS "-nodefaultlibs -dynamic -ffunction-sections -fdata-sections -Wl,-gc-sections")
-    set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${EXTRA_LINKER_FLAGS}")
-    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${EXTRA_LINKER_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions")
-    set (CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -s -DNDEBUG")
-    set (CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -s -DNDEBUG")
-    set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
-    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
-    set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -D_DEBUG")
-    set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -D_DEBUG")
+    ucm_add_linker_flags(SHARED EXE -nodefaultlibs -dynamic -ffunction-sections -fdata-sections -Wl,-gc-sections)
+    ucm_add_flags(CXX -fno-rtti -fno-exceptions)
+    ucm_add_flags(CONFIG MinSizeRel -s)
 endif ()
+
+add_compile_options(
+    $<$<CONFIG:Debug>:-DDEBUG=1>
+    $<$<CONFIG:RelWithDebInfo>:-DDEBUG=1>
+    $<$<CONFIG:Release>:-DNDEBUG=1>
+    $<$<CONFIG:MinSizeRel>:-DNDEBUG=1>
+)
 
 add_subdirectory(dep)
 add_subdirectory(src)

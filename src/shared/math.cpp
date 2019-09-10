@@ -21,6 +21,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
+// Trick compiler into linking to _snprintf from ntdll and thus save executable size.
+#define _NO_CRT_STDIO_INLINE
 #include <windows.h>
 #include <stdint.h>
 #include <stdlib.h>
