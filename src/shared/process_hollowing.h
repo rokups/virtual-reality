@@ -35,4 +35,16 @@ struct hollow_process_startup_info
     unsigned shellcode_len = 0;
 };
 
-PROCESS_INFORMATION hollow_process(void* image, const char* host, hollow_process_startup_info* info);
+struct hollow_process_information : PROCESS_INFORMATION
+{
+    hollow_process_information() : PROCESS_INFORMATION()
+    {
+        hProcess = nullptr;
+        hThread = nullptr;
+        dwProcessId = 0;
+        dwThreadId = 0;
+    }
+    void* base_address = nullptr;
+};
+
+hollow_process_information hollow_process(void* image, const char* host, hollow_process_startup_info* info);
