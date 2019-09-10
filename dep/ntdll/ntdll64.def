@@ -103,7 +103,7 @@ KiRaiseUserExceptionDispatcher
 KiUserApcDispatcher
 KiUserCallbackDispatcher
 KiUserExceptionDispatcher
-KiUserInvertedFunctionTable DATA
+KiUserInvertedFunctionTable
 LdrAccessResource
 LdrAddDllDirectory
 LdrAddLoadAsDataTable
@@ -167,7 +167,7 @@ LdrSetMUICacheType
 LdrShutdownProcess
 LdrShutdownThread
 LdrStandardizeSystemPath
-LdrSystemDllInitBlock DATA
+LdrSystemDllInitBlock
 LdrUnloadAlternateResourceModule
 LdrUnloadAlternateResourceModuleEx
 LdrUnloadDll
@@ -183,9 +183,9 @@ MD4Update
 MD5Final
 MD5Init
 MD5Update
-NlsAnsiCodePage DATA
-NlsMbCodePageTag DATA
-NlsMbOemCodePageTag DATA
+NlsAnsiCodePage
+NlsMbCodePageTag
+NlsMbOemCodePageTag
 NtAcceptConnectPort
 NtAccessCheck
 NtAccessCheckAndAuditAlarm
@@ -1193,7 +1193,7 @@ RtlNormalizeString
 RtlNtPathNameToDosPathName
 RtlNtStatusToDosError
 RtlNtStatusToDosErrorNoTeb
-RtlNtdllName DATA
+RtlNtdllName
 RtlNumberGenericTableElements
 RtlNumberGenericTableElementsAvl
 RtlNumberOfClearBits
@@ -1514,7 +1514,7 @@ RtlpConvertRelativeToAbsoluteSecurityAttribute
 RtlpCreateProcessRegistryInfo
 RtlpEnsureBufferSize
 RtlpExecuteUmsThread
-RtlpFreezeTimeBias DATA
+RtlpFreezeTimeBias
 RtlpGetDeviceFamilyInfoEnum
 RtlpGetLCIDFromLangInfoNode
 RtlpGetNameFromLangInfoNode
@@ -2110,7 +2110,7 @@ __misaligned_access
 __toascii
 _atoi64
 _errno
-_fltused DATA
+_fltused
 _i64toa
 _i64toa_s
 _i64tow

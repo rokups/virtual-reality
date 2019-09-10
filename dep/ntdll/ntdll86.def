@@ -170,7 +170,7 @@ LdrSetMUICacheType@4
 LdrShutdownProcess
 LdrShutdownThread
 LdrStandardizeSystemPath@4
-LdrSystemDllInitBlock DATA
+LdrSystemDllInitBlock
 LdrUnloadAlternateResourceModule@4
 LdrUnloadAlternateResourceModuleEx@8
 LdrUnloadDll@4
@@ -187,9 +187,9 @@ MD4Update@12
 MD5Final@4
 MD5Init@4
 MD5Update@12
-NlsAnsiCodePage DATA
-NlsMbCodePageTag DATA
-NlsMbOemCodePageTag DATA
+NlsAnsiCodePage
+NlsMbCodePageTag
+NlsMbOemCodePageTag
 NtAcceptConnectPort@24
 NtAccessCheck@32
 NtAccessCheckAndAuditAlarm@44
@@ -1517,7 +1517,7 @@ RtlpConvertLCIDsToCultureNames@8
 RtlpConvertRelativeToAbsoluteSecurityAttribute@16
 RtlpCreateProcessRegistryInfo@4
 RtlpEnsureBufferSize@12
-RtlpFreezeTimeBias DATA
+RtlpFreezeTimeBias
 RtlpGetDeviceFamilyInfoEnum@12
 RtlpGetLCIDFromLangInfoNode@12
 RtlpGetNameFromLangInfoNode@12
@@ -1652,7 +1652,7 @@ WinSqmSetString@12
 WinSqmStartSession@12
 WinSqmStartSessionForPartner@16
 WinSqmStartSqmOptinListener
-Wow64Transition DATA
+Wow64Transition
 ZwAcceptConnectPort@24
 ZwAccessCheck@32
 ZwAccessCheckAndAuditAlarm@44
@@ -2148,7 +2148,7 @@ _aullshr
 _chkstk
 _errno
 _except_handler4_common
-_fltused DATA
+_fltused
 _ftol
 _ftol2
 _ftol2_sse

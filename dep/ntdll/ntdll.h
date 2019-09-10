@@ -6203,7 +6203,7 @@ typedef struct _BASE_SET_REENTER_COUNT
 	ULONG fIncDec;
 } BASE_SET_REENTER_COUNT, *PBASE_SET_REENTER_COUNT;	// <size 0x8>
 
-#if !defined(_WINNT_) || (defined(_MSC_VER) && (_MSC_VER >= 1300))
+#if !defined(_WINNT_) || (defined(_MSC_VER) && (_MSC_VER < 1300))
 typedef enum
 {
     ACTCTX_RUN_LEVEL_UNSPECIFIED = 0,
