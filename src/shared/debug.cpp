@@ -29,12 +29,10 @@
 #include <string.h>
 #include "debug.h"
 
-#if _DEBUG
-void dbg_null_stub() { }
-
-void debug_log(const char* format, DebugLevel lvl, const char* file, unsigned line, ...)
+#ifdef DEBUG_MIN_LOG_LEVEL
+extern "C" void debug_log(DebugLevel lvl, const char* format, const char* file, unsigned line, ...)
 {
-    if (DEBUG_MIN_LOG_LEVEL > lvl)
+    if (DEBUG_MIN_LOG_LEVEL >= lvl)
         return;
 
     va_list ap;
@@ -63,42 +61,6 @@ void debug_log(const char* format, DebugLevel lvl, const char* file, unsigned li
 
     OutputDebugStringA(msg.data());
     printf("%s\n", msg.data());
-
-    va_end(ap);
-}
-
-void debug_log(const wchar_t* format, DebugLevel lvl, const char* file, unsigned line, ...)
-{
-    if (DEBUG_MIN_LOG_LEVEL > lvl)
-        return;
-
-    va_list ap;
-    va_start(ap, line);
-
-    time_t now = 0;
-    time(&now);
-    tm* ts = localtime(&now);
-    stl::vector<wchar_t> timestamp(20);
-    auto need = static_cast<size_t>(_snwprintf(timestamp.data(), timestamp.size(), L"[%02d:%02d:%02d]", ts->tm_hour, ts->tm_min, ts->tm_sec));
-    auto timestamp_len = wcslen(timestamp.data());
-    assert(need < timestamp.size());
-
-    stl::vector<wchar_t> msg(timestamp.size() + wcslen(format) * 2, 0);
-
-    need = _vsnwprintf(msg.data(), msg.size(), format, ap) + timestamp_len + 1;
-    if (msg.size() <= need)
-    {
-        msg.resize(need + 1);
-        _vsnwprintf(msg.data(), msg.size(), format, ap);
-    }
-
-    memmove(msg.data() + timestamp_len + 1, msg.data(), wcslen(msg.data()));
-    memmove(msg.data(), timestamp.data(), timestamp_len);
-    msg.data()[timestamp_len] = ' ';
-
-    OutputDebugStringW(msg.data());
-
-    wprintf(L"%s\n", msg.data());
 
     va_end(ap);
 }

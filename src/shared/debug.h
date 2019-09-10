@@ -23,27 +23,32 @@
 //
 #pragma once
 
-enum class DebugLevel
+
+enum DebugLevel
 {
-    Debug,
-    Warning,
-    Error,
-    Critical,
+    DebugLevelDebug,
+    DebugLevelWarning,
+    DebugLevelError,
+    DebugLevelCritical,
 };
 
-#define DEBUG_MIN_LOG_LEVEL DebugLevel::Debug
+#ifdef DEBUG
+#   define DEBUG_MIN_LOG_LEVEL DebugLevelDebug
+#endif
 
-void debug_log(const char* format, DebugLevel lvl, const char* file, unsigned line, ...);
-void debug_log(const wchar_t* format, DebugLevel lvl, const char* file, unsigned line, ...);
+#ifdef __cplusplus
+extern "C"
+#endif
+void debug_log(enum DebugLevel lvl, const char* format, const char* file, unsigned line, ...);
 
-#if _DEBUG
-#   define LOG_CRITICAL(format, ...)    debug_log(format, DebugLevel::Critical, __FILE__, __LINE__, ##__VA_ARGS__)
-#   define LOG_ERROR(format, ...)        debug_log(format, DebugLevel::Error, __FILE__, __LINE__, ##__VA_ARGS__)
-#   define LOG_WARNING(format, ...)        debug_log(format, DebugLevel::Warning, __FILE__, __LINE__, ##__VA_ARGS__)
-#   define LOG_DEBUG(format, ...)        debug_log(format, DebugLevel::Debug, __FILE__, __LINE__, ##__VA_ARGS__)
+#ifdef DEBUG_MIN_LOG_LEVEL
+#   define LOG_CRITICAL(format, ...)    debug_log(DebugLevelCritical, format, __FILE__, __LINE__, ##__VA_ARGS__)
+#   define LOG_ERROR(format, ...)       debug_log(DebugLevelError, format, __FILE__, __LINE__, ##__VA_ARGS__)
+#   define LOG_WARNING(format, ...)     debug_log(DebugLevelWarning, format, __FILE__, __LINE__, ##__VA_ARGS__)
+#   define LOG_DEBUG(format, ...)       debug_log(DebugLevelDebug, format, __FILE__, __LINE__, ##__VA_ARGS__)
 #else
-#   define LOG_CRITICAL(...)    (void)0
-#   define LOG_ERROR(...)        (void)0
-#   define LOG_WARNING(...)        (void)0
-#   define LOG_DEBUG(...)        (void)0
+#   define LOG_CRITICAL(...)            (void)0
+#   define LOG_ERROR(...)               (void)0
+#   define LOG_WARNING(...)             (void)0
+#   define LOG_DEBUG(...)               (void)0
 #endif
