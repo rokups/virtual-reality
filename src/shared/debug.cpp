@@ -23,11 +23,13 @@
 //
 #include <windows.h>
 #include <stl/vector.h>
-#include <cstdio>
-#include <ctime>
-#include <cassert>
+#include <stdio.h>
+#include <time.h>
+#include <assert.h>
+#include <string.h>
 #include "debug.h"
 
+#if _DEBUG
 void dbg_null_stub() { }
 
 void debug_log(const char* format, DebugLevel lvl, const char* file, unsigned line, ...)
@@ -42,7 +44,7 @@ void debug_log(const char* format, DebugLevel lvl, const char* file, unsigned li
     time(&now);
     tm* ts = localtime(&now);
     stl::vector<char> timestamp(20);
-    auto need = static_cast<size_t>(snprintf(timestamp.data(), timestamp.size(), "[%02d:%02d:%02d]", ts->tm_hour, ts->tm_min, ts->tm_sec));
+    auto need = static_cast<size_t>(_snprintf(timestamp.data(), timestamp.size(), "[%02d:%02d:%02d]", ts->tm_hour, ts->tm_min, ts->tm_sec));
     auto timestamp_len = strlen(timestamp.data());
     assert(need < timestamp.size());
 
@@ -100,3 +102,4 @@ void debug_log(const wchar_t* format, DebugLevel lvl, const char* file, unsigned
 
     va_end(ap);
 }
+#endif

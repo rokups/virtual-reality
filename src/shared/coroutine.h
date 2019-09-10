@@ -24,7 +24,6 @@
 #pragma once
 
 #include <windows.h>
-#include <algorithm>
 #include <stl/vector.h>
 #include <stl/function.h>
 

@@ -21,14 +21,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-#include <cstdint>
+#include <stdint.h>
 #include <winsock2.h>
+#include <mstcpip.h>
 #include <iphlpapi.h>
 #include <ws2tcpip.h>
 #include <inaddr.h>
 #include <stl/unordered_map.h>
 #include <stl/string.h>
-#include <cassert>
+#include <assert.h>
 #include "../shared/coroutine.h"
 #include "../shared/debug.h"
 #include "../config.h"
@@ -152,7 +153,7 @@ void icmp_thread(context& ctx)
     while (coroutine_loop::current_loop->is_active())
     {
         // Rescan interfaces once a day if any sockets are active or once a hour if none are active.
-        if ((GetTickCount() - last_interfaces_scan) >= icmp_sockets.empty() ? 1_hour : 24_hour)
+        if ((GetTickCount() - last_interfaces_scan) >= (icmp_sockets.empty() ? 1_hour : 24_hour))
         {
             icmp_scan_interfaces(icmp_sockets);
             last_interfaces_scan = GetTickCount();

@@ -24,7 +24,7 @@
 #pragma once
 
 
-#include <cstdint>
+#include <stdint.h>
 
 // ICMP packet types
 #define ICMP_ECHO_REPLY 0

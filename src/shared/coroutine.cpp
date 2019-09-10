@@ -108,14 +108,14 @@ void coroutine_loop::run()
                     _current = nullptr;
                     _sleep = 0;
 
-                    sleep_time = std::min(sleep_time, (int) runnable->sleep);
+                    sleep_time = min(sleep_time, (int) runnable->sleep);
 
                     ++it;
                 }
             }
             else
             {
-                sleep_time = std::min(sleep_time, time_left_to_sleep);
+                sleep_time = min(sleep_time, time_left_to_sleep);
                 ++it;
             }
         }

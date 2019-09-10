@@ -46,7 +46,7 @@ void rc4_init(struct rc4_ctx* ctx, uint64_t key)
 void rc4_xor(struct rc4_ctx* ctx, unsigned char* buff, int len)
 {
     unsigned x = 0, y = 0;
-    for (unsigned i = 0; i < len; i++)
+    for (int i = 0; i < len; i++)
     {
         x = (x + 1) % 256;
         y = (y + ctx->s[x]) % 256;

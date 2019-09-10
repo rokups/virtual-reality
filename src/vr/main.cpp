@@ -33,7 +33,7 @@
 void icmp_thread(context& ctx);
 void imgur_thread(context& ctx);
 
-int main()
+INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow)
 {
     deterministic_uuid_seed = get_machine_hash();
 
@@ -66,4 +66,5 @@ int main()
     WSACleanup();
     ReleaseMutex(hMutex);
     CloseHandle(hMutex);
+    return 0;
 }

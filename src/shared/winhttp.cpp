@@ -22,11 +22,11 @@
 // DEALINGS IN THE SOFTWARE.
 //
 #include <windows.h>
-#include <winhttp.h>
-#include <cassert>
+#include <assert.h>
 #include <miniz.h>
 #include <mini_gzip.h>
 #include <stl/vector.h>
+#include <memory>       // std::move
 #include "win32.h"
 #include "winhttp.h"
 
@@ -131,7 +131,7 @@ HttpResponse send_http_request(HttpRequest& request, const stl::string& url, con
     }
 
     // Retry for several times if fails.
-    if (!WinHttpSendRequest(hRequest, WINHTTP_NO_ADDITIONAL_HEADERS, 0, request.content.data(), request.content.size(), request.content.size(), 0))
+    if (!WinHttpSendRequest(hRequest, WINHTTP_NO_ADDITIONAL_HEADERS, 0, request.content.data(), (DWORD)request.content.size(), (DWORD)request.content.size(), 0))
         return {};
 
     if (!WinHttpReceiveResponse(hRequest, nullptr))

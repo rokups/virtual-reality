@@ -21,7 +21,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-#include <ctime>
+#include <time.h>
 #include <picopng.h>
 #include <tiny-json.h>
 #include "../shared/winhttp.h"
@@ -94,7 +94,7 @@ void imgur_thread(context& ctx)
         {
             stl::vector<char> response_data(response.content.c_str(), response.content.c_str() + response.content.size() + 1);
 
-            const json_t* j_root = json_create(response_data.data(), pool.data(), pool.size());
+            const json_t* j_root = json_create(response_data.data(), pool.data(), (unsigned)pool.size());
             if (j_root == nullptr)
             {
                 LOG_ERROR("imgur api root is null. Malformed response or pool too small");

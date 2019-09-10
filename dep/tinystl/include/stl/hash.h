@@ -42,9 +42,9 @@
 namespace tinystl
 {
     static inline unsigned int hash_string(const char* str, size_t len) {
-#ifdef _MSC_VER
-        return crc32c_hw(str, (int)len, 0);
-#else
+// #ifdef _MSC_VER
+//         return crc32c_hw(str, (int)len, 0);
+// #else
 
         // Implementation of sdbm a public domain string hash from Ozan Yigit
         // see: http://www.eecs.harvard.edu/margo/papers/usenix91/paper.ps
@@ -55,7 +55,7 @@ namespace tinystl
             hash = *it + (hash << 6) + (hash << 16) - hash;
 
         return hash;
-#endif
+// #endif
     }
 
     static inline unsigned int hash(const char* str) {
