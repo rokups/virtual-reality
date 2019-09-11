@@ -22,10 +22,15 @@
 # DEALINGS IN THE SOFTWARE.
 #
 
-add_subdirectory(ntdll)
-add_subdirectory(tinystl)
-add_subdirectory(miniz)
-add_subdirectory(mini-gzip)
-add_subdirectory(picopng)
-add_subdirectory(tiny-json)
-add_subdirectory(hooker)
+file(GLOB_RECURSE SOURCE_FILES *.h *.c)
+add_executable(stager WIN32 ${SOURCE_FILES})
+target_link_libraries(stager shared ws2_32)
+if (NOT MSVC)
+    target_link_libraries(stager mingw32 gcc mingwex gcc msvcrt)   # CRT
+endif ()
+
+find_package (Python COMPONENTS Interpreter REQUIRED)
+add_custom_command(TARGET stager POST_BUILD
+    COMMAND ${Python_EXECUTABLE} -B ${CMAKE_SOURCE_DIR}/script/bin2h.py $<TARGET_FILE:stager> ${OUTPUT_BIN_DIRECTORY}/stager.exe.h STAGER
+    COMMENT "Creating stager.exe.h"
+)

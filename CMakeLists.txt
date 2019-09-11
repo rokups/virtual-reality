@@ -31,15 +31,25 @@ include(ucm.cmake)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(OUTPUT_BIN_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+if (MSVC)
+	set(OUTPUT_BIN_DIRECTORY ${OUTPUT_BIN_DIRECTORY}/$<CONFIG>)
+endif ()
+include_directories(${OUTPUT_BIN_DIRECTORY})
+
 set(CMAKE_CXX_STANDARD 17)
 ucm_set_runtime(STATIC)
-set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if (NOT WIN32)
     message(FATAL_ERROR "This project is meant for Windows platform only")
 endif ()
 
 if (MSVC)
+	if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../VC-LTL")
+		set(SupportWinXP "true")
+		add_definitions(-D_DISABLE_DEPRECATE_LTL_MESSAGE=1)
+		include("../VC-LTL/VC-LTL helper for cmake.cmake")
+	endif ()
     # Disable buffer security checks
     add_compile_options(/GS-)
     # Disable exceptions
@@ -49,7 +59,7 @@ if (MSVC)
     # Enable function level linking
     add_compile_options(/Gy)
     # Enable removal of unreferenced code
-    ucm_add_linker_flags(EXE SHARED MODULE /OPT:REF)
+    ucm_add_linker_flags(EXE SHARED MODULE CONFIG Release MinSizeRel /OPT:REF)
     # Silence useless warnings
     add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_WINSOCK_DEPRECATED_NO_WARNINGS)
     # Enable runtime code generation
@@ -62,12 +72,22 @@ if (MINGW)
     ucm_add_flags(CONFIG MinSizeRel -s)
 endif ()
 
+add_definitions(-D_NO_NTDLL_CRT_)
+
 add_compile_options(
     $<$<CONFIG:Debug>:-DDEBUG=1>
     $<$<CONFIG:RelWithDebInfo>:-DDEBUG=1>
     $<$<CONFIG:Release>:-DNDEBUG=1>
     $<$<CONFIG:MinSizeRel>:-DNDEBUG=1>
 )
+
+macro (export_reflective_loader TARGET)
+	if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+		set_target_properties(${TARGET} PROPERTIES LINK_FLAGS "/INCLUDE:_ReflectiveLoader@4")
+	else ()
+		set_target_properties(${TARGET} PROPERTIES LINK_FLAGS "/INCLUDE:ReflectiveLoader")
+	endif ()
+endmacro ()
 
 add_subdirectory(dep)
 add_subdirectory(src)

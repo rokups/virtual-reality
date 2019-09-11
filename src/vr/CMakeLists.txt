@@ -23,8 +23,9 @@
 #
 
 file(GLOB_RECURSE SOURCE_FILES *.h *.cpp)
-add_executable(payload WIN32 ${SOURCE_FILES})
-target_link_libraries(payload shared tiny-json ws2_32 iphlpapi)
+add_executable(vr WIN32 ${SOURCE_FILES})
+target_link_libraries(vr shared tiny-json ws2_32 iphlpapi)
+export_reflective_loader(vr)
 if (NOT MSVC)
-    target_link_libraries(payload mingw32 gcc mingwex gcc msvcrt)   # CRT
+    target_link_libraries(vr mingw32 gcc mingwex gcc msvcrt)   # CRT
 endif ()

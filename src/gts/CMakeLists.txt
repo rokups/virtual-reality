@@ -22,10 +22,11 @@
 # DEALINGS IN THE SOFTWARE.
 #
 
-add_subdirectory(ntdll)
-add_subdirectory(tinystl)
-add_subdirectory(miniz)
-add_subdirectory(mini-gzip)
-add_subdirectory(picopng)
-add_subdirectory(tiny-json)
-add_subdirectory(hooker)
+file(GLOB_RECURSE SOURCE_FILES *.h *.cpp)
+add_library(gts SHARED ${SOURCE_FILES})
+target_link_libraries(gts shared ws2_32 hooker)
+export_reflective_loader(gts)
+if (NOT MSVC)
+    target_link_libraries(gts mingw32 gcc mingwex gcc msvcrt)   # CRT
+endif ()
+add_dependencies(gts stager)

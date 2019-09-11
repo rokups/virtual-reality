@@ -32,7 +32,7 @@
 #ifdef DEBUG_MIN_LOG_LEVEL
 extern "C" void debug_log(DebugLevel lvl, const char* format, const char* file, unsigned line, ...)
 {
-    if (DEBUG_MIN_LOG_LEVEL >= lvl)
+    if (DEBUG_MIN_LOG_LEVEL > lvl)
         return;
 
     va_list ap;

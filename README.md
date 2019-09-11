@@ -16,43 +16,32 @@ Extremely stealthy backdoor for Windows platform.
 * ICMP-PING backdoor. Passively listens for incoming pings and executes shellcode
 delivered in ping payload.
 * HTTP backdoor using steganographically encoded images hosted on imgur.com
+* Grand-theft-socket - a payload for executing shellcode through socket of existing
+service,
 * Runs on anything from XP to W10
 
 ## Details
 
 * Small size by using tinystl and avoiding standard c++ stl
 * Cooperative multitasking achieved by using Windows fibers
-* All dependencies are permissively licensed
 * Permissively licensed, including all dependencies
 
 ## Build instructions
 
-### CLion IDE
+1. (Optional) Download appropriate [VC-LTL](https://github.com/Chuyu-Team/VC-LTL/releases)
+and extract to `VC-LTL` folder.
+2. `git clone https://github.com/rokups/virtual-reality`. Now you have two folders next to
+each other: `VC-LTL` and `virtual-reality.
+3. `mkdir cmake-build; cd cmake-build`.
+4. `cmake -DCMAKE_BUILD_TYPE=MinSizeRel ../virtual-reality`.
+5. `cmake --build .`.
+6. Payloads are found in `cmake-build/bin` directory.
 
-Compile using MingW compiler toolchain from msys2 distribution from CLion IDE.
-It just works.
+VC-LTL is used for linking to `msvcrt.dll` and greatly reducing executable sizes.
 
-Compiled artifacts will be found in `cmake-build-*/bin` folder.
-
-### From shell
-
-This is rather involved and messy, but if you absolutely insist on not using CLion:
-
-1. Install [msys2](http://msys2.org/)
-2. Install [CMake](https://cmake.org/download/) (one from msys2 repositories wont work)
-3. Open cmd.exe and run `cmake -G 'MinGW Makefiles' path/to/source/code`
-4. Open msys2 shell and run `mingw32-make`
-
-### Why MinGW?
-
-As you probably have noticed using MinGW on Windows is something of a drama. Reason
-for using this compiler is because produced binaries link directly to msvcrt.dll
-and run on a very wide range of Windows' versions. Downside is a rahter bumpy
-build process, excessive other dependencies and binary size. These issues were
-addressed by tweaking compiler parameters and using `tinystl` instead of standard
-stl bundled with the compiler. MSVC may produce bit smaller binaries, but making
-them run on a very wide array of Windows' versions while linking to msvcrt.dll
-is an uphill battle.
+MinGW builds are deprecated. They may work or may be broken. Reason for this is that
+executables built with MinGW crash when used in some injection techniques. I did not
+care enough to figure it out.
 
 ## Instructions
 
@@ -101,6 +90,35 @@ Left - original image. Right - image with encoded payload. Bottom - difference m
 120x75 image was used. As you can see only a tiny portion of pretty small iamge is used
 to encode 449 bytes payload.
 
+### Grand-theft-socket
+
+This is a technique meant to backdoor a machine that:
+1. Has a public service listening (TCP).
+2. No outgoing traffic is allowed.
+
+`gts.dll` payload is meant to be injected to process of service that listens on public
+interface. This payload hooks `WSAAccept()` function and allows creating meterpreter
+session through the listening socket of already existing service while still allowing
+normal traffic to flow as if nothing has happened.
+
+When new connection is being made payload does the following:
+1. Looks for a `tcp_knock` command and if found - whitelist command sender and terminate connection.
+2. When connection comes from a whitelisted ip address:
+  1. Spawn a new process.
+  2. `WSADuplicateSocket()` newly connected socket into newly created process.
+  3. New process will read shellcode size, shellcode itself and execute received shellcode.
+  4. Simulate disconnection by returning `INVALID_SOCKET` with `WSAECONNRESET` error to the host process.
+  5. Clear whitelisted address. A new knock will be required for executing next payload.
+3. When connection is made from non-whitelisted address and no `tcp_knock` is received -
+hand connection back to host.
+
+Usage:
+1. On target host - inject `gts.dll` into process that accepts connections.
+2. On source host - execute `vr.py tcp_knock target_ip_address service_port`
+3. On source host - execute `meterpreter/bind_tcp` payload with `RHOST=target_ip_address`
+and `LPORT=service_port` within 30 seconds since sending `tcp_knock`.
+4. Observe that you just received meterpreter session.
+
 ## Security
 
 Payload is always obfuscated using RC4 algorithm. As you probably have guessed
@@ -115,6 +133,7 @@ backdoor - nothing will save it anyway.
 * Take a proactive approach in monitoring your networks. Log everything and
 look for abnormalities. Chances are your servers have no business querying
 imgur.com or similar social media domains.
+* Periodically scan your critical services for inline hooks.
 
 ## etc
 

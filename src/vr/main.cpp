@@ -21,13 +21,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
+#include "../shared/context.h"
 #include "../shared/coroutine.h"
 #include "../config.h"
 #include "../shared/debug.h"
 #include "../shared/win32.h"
 #include "../shared/process_hollowing.h"
 #include "../shared/math.h"
-#include "context.h"
 
 
 void icmp_thread(context& ctx);

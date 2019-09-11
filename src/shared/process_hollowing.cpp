@@ -204,7 +204,7 @@ hollow_process_information hollow_process(void* image, const char* host, hollow_
         }
 
 #ifdef _M_X64
-        ctx.Rcx = ctx.Rip = entryPoint;
+        ctx.Rcx = entryPoint;
         ctx.SegGs = 0;
         ctx.SegFs = 0x53;
         ctx.SegEs = 0x2B;
@@ -213,7 +213,7 @@ hollow_process_information hollow_process(void* image, const char* host, hollow_
         ctx.SegCs = 0x33;
         ctx.EFlags = 0x3000;
 #else
-        ctx.Eax = ctx.Eip = entryPoint;
+        ctx.Eax = entryPoint;
         ctx.SegGs = 0;
         ctx.SegFs = 0x38;
         ctx.SegEs = 0x20;

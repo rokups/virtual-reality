@@ -23,11 +23,13 @@
 //
 #pragma once
 
-
+#include <winsock2.h>
+#include <time.h>
 #include <stl/unordered_map.h>
 #include <stl/string.h>
 
 struct context
 {
-    time_t payload_last_timestamp = 0;
+    time_t payload_last_timestamp = time(nullptr);
+    stl::string trusted_source;
 };

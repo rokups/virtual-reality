@@ -32,11 +32,9 @@
 #include <assert.h>
 #include "../shared/coroutine.h"
 #include "../shared/debug.h"
+#include "../shared/payload.h"
 #include "../config.h"
-#include "context.h"
 #include "icmp.hpp"
-
-extern bool handle_payload(context& ctx, uint8_t* data, unsigned len);
 
 SOCKET icmp_make_socket(int af, const sockaddr* addr, int alen)
 {

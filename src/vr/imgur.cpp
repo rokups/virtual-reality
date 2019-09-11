@@ -24,15 +24,13 @@
 #include <time.h>
 #include <picopng.h>
 #include <tiny-json.h>
+#include "../shared/context.h"
+#include "../shared/payload.h"
 #include "../shared/winhttp.h"
 #include "../shared/coroutine.h"
 #include "../shared/debug.h"
 #include "../shared/math.h"
 #include "../config.h"
-#include "context.h"
-
-
-extern bool handle_payload(context& ctx, uint8_t* data, unsigned len);
 
 bool png_has_enough_pixels(size_t pixel_bytes_count, unsigned need_bytes)
 {
