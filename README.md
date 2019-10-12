@@ -34,7 +34,8 @@ and extract to `VC-LTL` folder.
 each other: `VC-LTL` and `virtual-reality.
 3. `mkdir cmake-build; cd cmake-build`.
 4. `cmake -DCMAKE_BUILD_TYPE=MinSizeRel ../virtual-reality`.
-5. `cmake --build .`.
+5. `cmake --build . --config MinSizeRel`. Note that VC-LTL does not support debug builds.
+Do not build `Debug` configuration or ensure that `_DEBUG` preprocessor symbol is undefined.
 6. Payloads are found in `cmake-build/bin` directory.
 
 VC-LTL is used for linking to `msvcrt.dll` and greatly reducing executable sizes.
