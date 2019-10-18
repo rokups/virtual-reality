@@ -23,6 +23,8 @@
 //
 #pragma once
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,6 +34,9 @@ extern uint64_t deterministic_uuid_seed;
 int random(int min, int max);
 uint64_t get_machine_hash();
 void deterministic_uuid(uint64_t seed, char uuid[44]);
+HANDLE mutex_lock(uint64_t seed);
+BOOL mutex_is_locked(uint64_t seed);
+int64_t combine_hash(int64_t result, int64_t hash);
 
 #ifdef __cplusplus
 }

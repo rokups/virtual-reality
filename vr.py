@@ -107,7 +107,7 @@ def read_key(key):
     if key is not None:
         return key
 
-    config_h = open(os.path.dirname(os.path.abspath(__file__)) + '/src/config.h').read()
+    config_h = open(os.path.dirname(os.path.abspath(__file__)) + '/vr-config.h').read()
     key_integer = re.search(r'#define +vr_shared_key +(.+)', config_h).group(1).rstrip('l').rstrip('u')
     return struct.pack('<Q', int(key_integer, 16 if key_integer.startswith('0x') else 10))
 

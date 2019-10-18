@@ -27,6 +27,10 @@
 #include <stl/vector.h>
 #include <stl/function.h>
 
+inline unsigned operator "" _sec(unsigned long long int n) { return static_cast<unsigned int>(n * 1000); }
+inline unsigned operator "" _min(unsigned long long int n) { return static_cast<unsigned int>(n * 60 * 1000); }
+inline unsigned operator "" _hour(unsigned long long int n) { return static_cast<unsigned int>(n * 60 * 60 * 1000); }
+
 typedef stl::function<void()> coro_func;
 
 class coroutine_loop

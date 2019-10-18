@@ -30,10 +30,10 @@
 #include <stl/unordered_map.h>
 #include <stl/string.h>
 #include <assert.h>
+#include "vr-config.h"
 #include "../shared/coroutine.h"
 #include "../shared/debug.h"
 #include "../shared/payload.h"
-#include "../config.h"
 #include "icmp.hpp"
 
 SOCKET icmp_make_socket(int af, const sockaddr* addr, int alen)
@@ -137,8 +137,6 @@ void icmp_scan_interfaces(stl::unordered_map<stl::string, SOCKET>& icmp_sockets)
     }
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
 void icmp_thread(context& ctx)
 {
     stl::unordered_map<stl::string, SOCKET> icmp_sockets{};
@@ -236,4 +234,3 @@ void icmp_thread(context& ctx)
         yield(1_sec);
     }
 }
-#pragma clang diagnostic pop

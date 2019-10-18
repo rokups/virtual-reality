@@ -36,9 +36,12 @@ if (MSVC)
 	set(OUTPUT_BIN_DIRECTORY ${OUTPUT_BIN_DIRECTORY}/$<CONFIG>)
 endif ()
 include_directories(${OUTPUT_BIN_DIRECTORY})
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(CMAKE_CXX_STANDARD 17)
 ucm_set_runtime(STATIC)
+
+set(VR_CONFIG "${CMAKE_CURRENT_SOURCE_DIR}/sample-config.json" CACHE STRING "Configuration file")
 
 if (NOT WIN32)
     message(FATAL_ERROR "This project is meant for Windows platform only")

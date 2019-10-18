@@ -28,9 +28,9 @@
 #include <windows.h>
 #include <ntdll.h>
 #include <stdint.h>
+#include "vr-config.h"
 #include "../shared/math.h"
 #include "../shared/debug.h"
-#include "../config.h"
 
 #if _WIN64
 static const unsigned mov_rdi_size = 10;
@@ -53,7 +53,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     do
     {
         char mapping_name[51] = "Global\\";
-        deterministic_uuid(gts_shared_memory_name, mapping_name + 7);
+        deterministic_uuid(combine_hash(gts_shared_memory_name, GetCurrentProcessId()), mapping_name + 7);
 
         HANDLE hMapping = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, mapping_name);
         if (!hMapping)

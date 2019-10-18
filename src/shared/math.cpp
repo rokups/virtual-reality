@@ -27,9 +27,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "vr-config.h"
 #include "math.h"
 #include "rc4.h"
-#include "../config.h"
 
 extern "C"
 {
@@ -92,6 +92,48 @@ void deterministic_uuid(uint64_t seed, char uuid[44])
     c &= 0xfff; // Clear first digit so it can be always 4. Lets pretend its uuid4.
 
     _snprintf(uuid, 44, "{%08X-%04X-4%03X-%04X-%08X-%04X}", a, b, c, d, e, f);
+}
+
+HANDLE mutex_create(uint64_t seed)
+{
+    char mutexName[51] = "Global\\";
+    deterministic_uuid(seed, mutexName + 7);
+    return CreateMutexA(NULL, FALSE, mutexName);
+}
+
+bool mutex_acquire(HANDLE mutex)
+{
+    if (mutex == NULL)
+        return false;
+    auto result = WaitForSingleObject(mutex, 0);
+    return result == WAIT_ABANDONED || result == WAIT_OBJECT_0;
+}
+
+HANDLE mutex_lock(uint64_t seed)
+{
+    if (HANDLE mutex = mutex_create(seed))
+    {
+        if (mutex_acquire(mutex))
+            return mutex;
+        CloseHandle(mutex);
+    }
+    return 0;
+}
+
+BOOL mutex_is_locked(uint64_t seed)
+{
+    if (HANDLE mutex = mutex_lock(seed))
+    {
+        ReleaseMutex(mutex);
+        CloseHandle(mutex);
+        return FALSE;
+    }
+    return TRUE;
+}
+
+int64_t combine_hash(int64_t result, int64_t hash)
+{
+    return result ^ (hash + 0x9ddfea08eb382d69 + (result << 12) + (result >> 4));
 }
 
 }

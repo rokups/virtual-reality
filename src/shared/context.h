@@ -27,9 +27,50 @@
 #include <time.h>
 #include <stl/unordered_map.h>
 #include <stl/string.h>
+#include <tiny-json.h>
+#include "xorstr.hpp"
+#include "vr-config.h"
 
 struct context
 {
     time_t payload_last_timestamp = time(nullptr);
     stl::string trusted_source;
+    stl::string imgur_client_id;
+    stl::string imgur_tag;
+    stl::string vr_config;
+    int imgur_tag_query_time;           // Minutes
+    int imgur_tag_query_time_jitter;    // Minutes
+    json_t pool[128];
+    const json_t* root;
+
+    context()
+    {
+        vr_config = xorstr_(VR_CONFIG);
+        root = json_create(&vr_config.at(0), pool, 128);
+    }
+
+    stl::string get_prop_string(const char* prop_name) const
+    {
+        if (const json_t * prop = json_getProperty(root, prop_name))
+        {
+            if (prop->type == JSON_TEXT)
+                return prop->u.value;
+        }
+        return "";
+    }
+
+    int64_t get_prop_number(const char* prop_name) const
+    {
+        if (const json_t * prop = json_getProperty(root, prop_name))
+        {
+            if (prop->type == JSON_INTEGER)
+                return atoll(prop->u.value);
+            if (prop->type == JSON_TEXT && strncmp(prop->u.value, "0x", 2) == 0)
+            {
+                char* end = nullptr;
+                return strtoull(prop->u.value, &end, 16);
+            }
+        }
+        return 0;
+    }
 };

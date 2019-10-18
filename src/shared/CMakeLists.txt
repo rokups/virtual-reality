@@ -22,9 +22,18 @@
 # DEALINGS IN THE SOFTWARE.
 #
 
+# Generate config and copy vr.py to bin dir for distribution
+add_custom_command(
+    OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/vr-config.h
+    COMMAND ${CMAKE_COMMAND} -DVR_CONFIG=${VR_CONFIG} -DVR_SOURCE_DIR=${VR_SOURCE_DIR}
+	        -DOUTPUT_BIN_DIRECTORY=${OUTPUT_BIN_DIRECTORY} -P ${VR_SOURCE_DIR}/configure.cmake
+    COMMAND ${CMAKE_COMMAND} -E copy ${VR_SOURCE_DIR}/vr.py ${OUTPUT_BIN_DIRECTORY}/vr.py)
+set_source_files_properties(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/vr-config.h PROPERTIES GENERATED TRUE)	
+
+# Build shared library
 file(GLOB_RECURSE SOURCE_FILES *.c *.cpp *.h *.hpp)
-add_library(shared STATIC ${SOURCE_FILES})
+add_library(shared STATIC ${SOURCE_FILES} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/vr-config.h)
 if (NOT MSVC)
     target_compile_options(shared PRIVATE -Wno-multichar)
 endif ()
-target_link_libraries(shared PUBLIC mini-gzip miniz picopng tinystl crypt32 winhttp ntdll)
+target_link_libraries(shared PUBLIC mini-gzip miniz picopng tinystl tiny-json crypt32 winhttp ntdll)

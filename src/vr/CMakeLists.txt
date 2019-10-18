@@ -22,10 +22,11 @@
 # DEALINGS IN THE SOFTWARE.
 #
 
-file(GLOB_RECURSE SOURCE_FILES *.h *.cpp)
-add_executable(vr WIN32 ${SOURCE_FILES})
+file(GLOB_RECURSE SOURCE_FILES *.h *.hpp *.cpp)
+add_executable(vr WIN32 ${SOURCE_FILES} ${VR_CONFIG})
 target_link_libraries(vr shared tiny-json ws2_32 iphlpapi)
 export_reflective_loader(vr)
+add_dependencies(vr gts stager)
 if (NOT MSVC)
     target_link_libraries(vr mingw32 gcc mingwex gcc msvcrt)   # CRT
 endif ()

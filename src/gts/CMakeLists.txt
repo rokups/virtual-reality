@@ -30,3 +30,9 @@ if (NOT MSVC)
     target_link_libraries(gts mingw32 gcc mingwex gcc msvcrt)   # CRT
 endif ()
 add_dependencies(gts stager)
+
+find_package (Python COMPONENTS Interpreter REQUIRED)
+add_custom_command(TARGET gts POST_BUILD
+    COMMAND ${Python_EXECUTABLE} -B ${CMAKE_SOURCE_DIR}/script/bin2h.py $<TARGET_FILE:gts> ${OUTPUT_BIN_DIRECTORY}/gts.dll.h GTS
+    COMMENT "Creating gts.dll.h"
+)

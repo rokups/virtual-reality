@@ -28,7 +28,7 @@
 #include "../shared/win32.h"
 #include "../shared/rc4.h"
 #include "../shared/shellcode.h"
-#include "../config.h"
+#include "vr-config.h"
 #include "payload.h"
 
 

