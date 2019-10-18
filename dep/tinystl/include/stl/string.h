@@ -112,6 +112,7 @@ namespace tinystl {
         /// Copy chars from one buffer to another.
         static inline void copy_chars(char* dest, const char* src, unsigned count);
         static inline int compare(const char* lhs, const char* rhs, bool caseSensitive);
+        static inline string format(const char* fmt, va_list ap);
         static inline string format(const char* fmt, ...);
 
         /// Position for "not found."
@@ -747,16 +748,13 @@ namespace tinystl {
         }
     }
 
-    inline string string::format(const char* fmt, ...)
+    inline string string::format(const char* fmt, va_list ap)
     {
         int size = int(strlen(fmt) * 2 + 50);
         string str;
-        va_list ap;
         while (1) {     // Maximum two passes on a POSIX system...
             str.resize(size);
-            va_start(ap, fmt);
             int n = vsnprintf((char *)str.c_str(), size, fmt, ap);
-            va_end(ap);
             if (n > -1 && n < size) {  // Everything worked
                 str.resize(n);
                 return str;
@@ -766,6 +764,15 @@ namespace tinystl {
             else
                 size *= 2;      // Guess at a larger size (OS specific)
         }
+        return str;
+    }
+
+    inline string string::format(const char* fmt, ...)
+    {
+        va_list ap;
+        va_start(ap, fmt);
+        string str = string::format(fmt, ap);
+        va_end(ap);
         return str;
     }
 }

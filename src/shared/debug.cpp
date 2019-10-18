@@ -22,7 +22,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 #include <windows.h>
-#include <stl/vector.h>
+#include <stl/string.h>
 #include <stdio.h>
 #include <time.h>
 #include <assert.h>
@@ -41,27 +41,17 @@ extern "C" void debug_log(DebugLevel lvl, const char* format, const char* file, 
     time_t now = 0;
     time(&now);
     tm* ts = localtime(&now);
-    stl::vector<char> timestamp(20);
-    auto need = static_cast<size_t>(_snprintf(timestamp.data(), timestamp.size(), "[%02d:%02d:%02d]", ts->tm_hour, ts->tm_min, ts->tm_sec));
-    auto timestamp_len = strlen(timestamp.data());
-    assert(need < timestamp.size());
 
-    stl::vector<char> msg(timestamp.size() + strlen(format) * 2, 0);
-
-    need = vsnprintf(msg.data(), msg.size(), format, ap) + timestamp_len + 1;
-    if (msg.size() <= need)
+    stl::string base_msg = stl::string::format(format, ap);
+    stl::string msg = stl::string::format("[%02d:%02d:%02d] %s", ts->tm_hour, ts->tm_min, ts->tm_sec, base_msg.c_str());
+    if (IsDebuggerPresent())
     {
-        msg.resize(need + 1);
-        vsnprintf(msg.data(), msg.size(), format, ap);
+        msg += "\n";
+        printf("%s", msg.c_str());
     }
-
-    memmove(msg.data() + timestamp_len + 1, msg.data(), strlen(msg.data()));
-    memmove(msg.data(), timestamp.data(), timestamp_len);
-    msg.data()[timestamp_len] = ' ';
-
-    OutputDebugStringA(msg.data());
-    printf("%s\n", msg.data());
-
+    else
+        printf("%s\n", msg.c_str());
+    OutputDebugStringA(msg.c_str());
     va_end(ap);
 }
 #endif
