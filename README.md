@@ -6,7 +6,7 @@ This is a backdoor project for windows operating systems.
 ## Intended audience
 
 This is a proof-of-concept stealthy backdoor aimed to aid red teams in maintaining
-control of their targets during security evaluation process. Project also intends
+control of their targets during the security evaluation process. The project also intends
 to expose ways to abuse standard features.
 
 ## Features
@@ -16,7 +16,7 @@ Extremely stealthy backdoor for Windows platform.
 * ICMP-PING backdoor. Passively listens for incoming pings and executes shellcode
 delivered in ping payload.
 * HTTP backdoor using steganographically encoded images hosted on imgur.com
-* Grand-theft-socket - a payload for executing shellcode through socket of existing
+* Grand-theft-socket - a payload for executing shellcode through the socket of existing
 service,
 * Runs on anything from XP to W10
 
@@ -52,8 +52,8 @@ Use `vr.py` to interact with the backdoor.
 
 ### Shellcode payload
 
-`vr.py shellcode path/to/shellcode.bin` reads shellcode into script's memory.
-On it's own this is useless therefore combine it with other commands. You may
+`vr.py shellcode path/to/shellcode.bin` reads shellcode into the script's memory.
+On its own this is useless therefore combine it with other commands. You may
 use `-` instead of path in order to read shellcode from `stdin`.
 
 ### Ping transport
@@ -62,23 +62,23 @@ use `-` instead of path in order to read shellcode from `stdin`.
 `stdin` and sends it via icmp-ping to `192.168.0.1`. Backdoor running on that
 machine will execute this shellcode.
 
-Shellcode will be delivered to the target by sending it as ICMP-PING packet payload.
+The shellcode will be delivered to the target by sending it as ICMP-PING packet payload.
 
 ![ping-demo](https://user-images.githubusercontent.com/19151258/52339219-2c742600-2a15-11e9-95b0-212485421e35.png)
 
-Content of packet appears to be random. The only give-away that something is up
+Content of the packet appears to be random. The only give-away that something is up
 is a rather big packet size, although it is possible to customized packet size
-using ping utility or specify custom payload (linux).
+using ping utility or specify custom payload (Linux).
 
 ### imgur.com transport
 
 `msfvenom <...> | vr.py shellcode - -- png path/to/image.png` reads a shellcode
 from `stdin` and encodes into specified `image.png`. This image must exist and
 it must be in RGB format (no alpha). Resulting image should be uploaded to
-https://imgur.com/ and tagged with one or more tags while one of tags must be
+https://imgur.com/ and tagged with one or more tags while one of the tags must be
 one that is specified in `config.h`.
 
-Shellcode will be encoded into specified image by altering last two bits of
+The shellcode will be encoded into a specified image by altering the last two bits of
 each color component in the target image. 1 byte needs 4 color components
 to be encoded and thus requires 1.(3) pixels. Encoded images are indistinguishable
 from original to the naked eye. Backdoor queries imgur API for listing images
@@ -87,8 +87,8 @@ encoded payload.
 
 ![steg-demo](https://user-images.githubusercontent.com/19151258/52338654-adcab900-2a13-11e9-9887-3a55cde9dc36.png)
 
-Left - original image. Right - image with encoded payload. Bottom - difference mask.
-120x75 image was used. As you can see only a tiny portion of pretty small iamge is used
+Left - original image. Right - image with the encoded payload. Bottom - difference mask.
+120x75 image was used. As you can see only a tiny portion of the pretty small image is used
 to encode 449 bytes payload.
 
 ### Grand-theft-socket
@@ -103,15 +103,15 @@ session through the listening socket of already existing service while still all
 normal traffic to flow as if nothing has happened.
 
 When new connection is being made payload does the following:
-1. Looks for a `tcp_knock` command and if found - whitelist command sender and terminate connection.
-2. When connection comes from a whitelisted ip address:
+1. Looks for a `tcp_knock` command and if found - whitelist command sender and terminate the connection.
+2. When connection comes from a whitelisted IP address:
   1. Spawn a new process.
-  2. `WSADuplicateSocket()` newly connected socket into newly created process.
-  3. New process will read shellcode size, shellcode itself and execute received shellcode.
+  2. `WSADuplicateSocket()` newly connected socket into the newly created process.
+  3. The new process will read shellcode size, shellcode itself and execute received shellcode.
   4. Simulate disconnection by returning `INVALID_SOCKET` with `WSAECONNRESET` error to the host process.
-  5. Clear whitelisted address. A new knock will be required for executing next payload.
+  5. Clear whitelisted address. A new knock will be required for executing the next payload.
 3. When connection is made from non-whitelisted address and no `tcp_knock` is received -
-hand connection back to host.
+hand connection back to the host.
 
 Usage:
 1. On target host - inject `gts.dll` into process that accepts connections.
@@ -122,15 +122,15 @@ and `LPORT=service_port` within 30 seconds since sending `tcp_knock`.
 
 ## Security
 
-Payload is always obfuscated using RC4 algorithm. As you probably have guessed
-replay attacks are a thing against this backdoor. Also backdoor may be controlled
+Payload is always obfuscated using the RC4 algorithm. As you probably have guessed
+replay attacks are a thing against this backdoor. Also, backdoor may be controlled
 by a rival blue team if they have reverse-engineered sample and recovered RC4
-key. Utmost security is not the point of this project. If blue team is on to the
+key. Utmost security is not the point of this project. If the blue team is on to the
 backdoor - nothing will save it anyway.
 
 ## Recommendations
 
-* If possible - filter out ICMP-PING packets with in firewall
+* If possible - filter out ICMP-PING packets within the firewall
 * Take a proactive approach in monitoring your networks. Log everything and
 look for abnormalities. Chances are your servers have no business querying
 imgur.com or similar social media domains.
