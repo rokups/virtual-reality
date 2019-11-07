@@ -206,34 +206,32 @@ int main()
 {
     deterministic_uuid_seed = get_machine_hash();
     unsigned is_locked = 0;
-    HANDLE hThread = CreateThread(nullptr, 0, &lock_thread, &is_locked, 0, nullptr);
-
-    DWORD exit_code = 0;
-    if (WaitForSingleObject(hThread, 3000) != WAIT_TIMEOUT && GetExitCodeThread(hThread, &exit_code) && exit_code == 1)
+    if (HANDLE hThread = CreateThread(nullptr, 0, &lock_thread, &is_locked, 0, nullptr))
     {
-        LOG_ERROR("gts terminates because process %d is already injected.", GetCurrentProcessId());
-        return 0;
+        DWORD exit_code = 0;
+        if (WaitForSingleObject(hThread, 3000) != WAIT_TIMEOUT && GetExitCodeThread(hThread, &exit_code) && exit_code == 1)
+            LOG_ERROR("gts terminates because process %d is already injected.", GetCurrentProcessId());
+        else
+        {
+            LOG_DEBUG("gts runs in process %d", GetCurrentProcessId());
+            HMODULE ws2_32 = GetModuleHandleW(L"ws2_32.dll");
+            if (ws2_32)
+            {
+                void* WSAAccept_proc = (void*)GetProcAddress(ws2_32, "WSAAccept");
+                if (WSAAccept_proc)
+                    _WSAAccept = (WSAAccept_t)hooker_redirect(WSAAccept_proc, (void*)& WSAAccept_hook, 0);
+            }
+            return TRUE;
+        }
     }
-    else
-        LOG_DEBUG("gts runs in process %d", GetCurrentProcessId());
 
-    HMODULE ws2_32 = GetModuleHandleW(L"ws2_32.dll");
-    if (ws2_32)
-    {
-        void* WSAAccept_proc = (void*)GetProcAddress(ws2_32, "WSAAccept");
-        if (WSAAccept_proc)
-            _WSAAccept = (WSAAccept_t)hooker_redirect(WSAAccept_proc, (void*)&WSAAccept_hook, 0);
-    }
-
-    return 0;
+    return FALSE;
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
     if (fdwReason == DLL_PROCESS_ATTACH)
-    {
-        main();
-    }
+        return main();
 
     return TRUE;
 }
