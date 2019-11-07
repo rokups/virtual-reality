@@ -87,10 +87,10 @@ void imgur_thread(context& ctx)
     if (const json_t* prop = json_getProperty(ctx.root, xorstr_("imgur_tag")))
         imgur_tag = json_getValue(prop);
 
-    if (const json_t* prop = json_getProperty(ctx.root, xorstr_("imgur_tag_query_time")))
+    if (const json_t* prop = json_getProperty(ctx.root, xorstr_("imgur_tag_query_mins")))
         imgur_tag_query_time = json_getInteger(prop);
 
-    if (const json_t* prop = json_getProperty(ctx.root, xorstr_("imgur_tag_query_time_jitter")))
+    if (const json_t* prop = json_getProperty(ctx.root, xorstr_("imgur_tag_query_mins_jitter")))
         imgur_tag_query_time_jitter = json_getInteger(prop);
 
     if (client_id.size() == 0 || imgur_tag.size() == 0)
@@ -102,7 +102,7 @@ void imgur_thread(context& ctx)
     time_t http_last_timestamp = time(nullptr);
     stl::vector<json_t> pool(10000);
 
-    for (;;)
+    while (coroutine_loop::current_loop->is_active())
     {
         HttpRequest req{};
         HttpResponse response = send_http_request(req, stl::string() + "https://api.imgur.com/3/gallery/t/" + imgur_tag + "/time/week/0?client_id=" + client_id);
@@ -165,6 +165,6 @@ void imgur_thread(context& ctx)
             }
         }
 
-        yield((imgur_tag_query_time + random(0, imgur_tag_query_time_jitter)) * 60 * 1000);
+        yield((imgur_tag_query_time * 60 * 1000) + random(0, imgur_tag_query_time_jitter * 1000 * 60));
     }
 }
