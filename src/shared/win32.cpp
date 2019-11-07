@@ -36,7 +36,7 @@ stl::vector<wchar_t> to_wstring(const stl::string& str)
     stl::vector<wchar_t> result;
     if (auto need = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), nullptr, 0))
     {
-        result.resize(static_cast<size_t>(need) + 1, L'\0');
+        result.resize(static_cast<size_t>(need), L'\0');
         MultiByteToWideChar(CP_UTF8, 0, str.c_str(),
             static_cast<int>(str.size()), result.data(), static_cast<int>(result.size()));
     }
@@ -49,7 +49,7 @@ stl::string from_wstring(const wchar_t* str)
     int len = static_cast<int>(wcslen(str));
     if (auto need = WideCharToMultiByte(CP_UTF8, 0, str, len, nullptr, 0, nullptr, nullptr))
     {
-        result.resize(static_cast<size_t>(need) + 1);
+        result.resize(static_cast<size_t>(need));
         WideCharToMultiByte(CP_UTF8, 0, str, len, &result.at(0), static_cast<int>(result.size()), nullptr, nullptr);
     }
     return result;
