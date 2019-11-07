@@ -23,7 +23,13 @@
 #
 
 file(GLOB_RECURSE SOURCE_FILES *.h *.hpp *.cpp)
-add_executable(vr WIN32 ${SOURCE_FILES} ${VR_CONFIG})
+if (VR_PAYLOAD_SERVICE)
+    add_library(vr MODULE ${SOURCE_FILES} ${VR_CONFIG})
+    target_compile_definitions(vr PRIVATE -DVR_PAYLOAD_SERVICE=1)
+else ()
+    add_executable(vr WIN32 ${SOURCE_FILES} ${VR_CONFIG})
+    export_reflective_loader(vr)
+endif ()
 target_link_libraries(vr shared tiny-json ws2_32 iphlpapi)
 export_reflective_loader(vr)
 add_dependencies(vr gts stager)

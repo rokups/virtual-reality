@@ -93,5 +93,7 @@ macro (export_reflective_loader TARGET)
 	endif ()
 endmacro ()
 
+option(VR_PAYLOAD_SERVICE "Build payload as service dll" OFF)
+
 add_subdirectory(dep)
 add_subdirectory(src)
