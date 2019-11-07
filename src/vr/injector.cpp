@@ -37,9 +37,7 @@ void injector_thread(context& ctx)
 {
     int scan_time = 1;
     int scan_time_jitter = 1;
-    const json_t* payloads = nullptr;
-    if (const json_t* injector = json_getProperty(ctx.root, xorstr_("injector")))
-        payloads = json_getProperty(injector, xorstr_("payloads"));
+    const json_t* payloads = json_getProperty(ctx.root, xorstr_("injector"));
 
     if (payloads == nullptr || json_getType(payloads) != JSON_ARRAY)
     {
