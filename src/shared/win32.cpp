@@ -54,3 +54,18 @@ stl::string from_wstring(const wchar_t* str)
     }
     return result;
 }
+
+#ifndef _WIN64
+extern "C" void free_module_exit_thread(HMODULE hModule)
+{
+    __asm
+    {
+        push 0                          ; thread exit code
+        push 0C000h                     ; MEM_RELEASE | MEM_DECOMMIT
+        push 0                          ; size
+        push hModule                    ; module
+        push dword ptr [ExitThread]     ; ExitThread
+        jmp  dword ptr [VirtualFree]    ; VirtualFree
+    }
+}
+#endif

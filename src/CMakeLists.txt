@@ -25,4 +25,5 @@
 add_subdirectory(shared)
 add_subdirectory(stager)
 add_subdirectory(gts)
+add_subdirectory(keylogger)
 add_subdirectory(vr)

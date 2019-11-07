@@ -33,6 +33,10 @@ set_source_files_properties(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR
 
 # Build shared library
 file(GLOB_RECURSE SOURCE_FILES *.c *.cpp *.h *.hpp)
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+	enable_language(ASM_MASM)
+	list (APPEND SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/free_exit.asm)
+endif ()
 add_library(shared STATIC ${SOURCE_FILES} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/vr-config.h)
 if (NOT MSVC)
     target_compile_options(shared PRIVATE -Wno-multichar)

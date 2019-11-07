@@ -37,6 +37,7 @@ void deterministic_uuid(uint64_t seed, char uuid[44]);
 HANDLE mutex_lock(uint64_t seed);
 BOOL mutex_is_locked(uint64_t seed);
 int64_t combine_hash(int64_t result, int64_t hash);
+uint32_t fnv32a(const void* data, int len);
 
 #ifdef __cplusplus
 }

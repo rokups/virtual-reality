@@ -136,6 +136,17 @@ int64_t combine_hash(int64_t result, int64_t hash)
     return result ^ (hash + 0x9ddfea08eb382d69 + (result << 12) + (result >> 4));
 }
 
+uint32_t fnv32a(const void* data, int len)
+{
+    uint32_t hash = 2166136261;
+    for (const uint8_t* p = (const uint8_t*)data, * end = p + len; p < end; p++)
+    {
+        hash ^= *p;
+        hash *= 16777619;
+    }
+    return hash;
+}
+
 }
 
 stl::string deterministic_uuid(uint64_t seed)

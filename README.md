@@ -120,6 +120,18 @@ Usage:
 and `LPORT=service_port` within 30 seconds since sending `tcp_knock`.
 4. Observe that you just received meterpreter session.
 
+### Keylogger
+
+Keylogger module works by injecting a dll to a process that runs in user's session.
+It is injected into explorer.exe by default. Only one injection per user session will
+be active. Keylogger monitors user's keystrokes and clipboard and writes contents into
+file `C:\Windows\Temp\????????-????-????-????-????????????.N` where `?` is `[A-F0-9]`
+and `N` is a number (starting from 0). This file is a zip archive with first two bytes
+zeroed out. In order to access logs user should download a file and restore first two
+bytes which are `PK`. Removing file will cause keylogger to create a new archive next
+time any logs are available. Keylogger thread exits and frees it's memory if main
+backdoor terminates.
+
 ## Security
 
 Payload is always obfuscated using the RC4 algorithm. As you probably have guessed

