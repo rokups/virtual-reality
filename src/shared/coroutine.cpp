@@ -22,6 +22,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 #include "coroutine.h"
+#include "../shared/debug.h"
 
 coroutine_loop* coroutine_loop::current_loop{};
 
@@ -47,7 +48,6 @@ unsigned coroutine_loop::_run_coro_func(void*)
 
 coroutine_loop::coroutine_loop()
 {
-    _main_fiber = ConvertThreadToFiber(nullptr);
     _sleep = 0;
     _terminating = false;
 }
@@ -55,6 +55,8 @@ coroutine_loop::coroutine_loop()
 void coroutine_loop::activate(coroutine_loop& loop)
 {
     current_loop = &loop;
+    if (loop._main_fiber == nullptr)
+        loop._main_fiber = ConvertThreadToFiber(nullptr);
 }
 
 void* coroutine_loop::get_main_fiber(unsigned int ms)
@@ -90,7 +92,7 @@ void coroutine_loop::run()
             auto& runnable = *it;
             unsigned time_slept = GetTickCount() - runnable->last_run;
             int time_left_to_sleep = runnable->sleep - time_slept;
-            if (!_terminating && time_left_to_sleep <= 0)
+            if (_terminating || time_left_to_sleep <= 0)
             {
                 _current = runnable;
                 SwitchToFiber(runnable->this_fiber);
