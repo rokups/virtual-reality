@@ -36,6 +36,7 @@ if (MSVC)
 	set(OUTPUT_BIN_DIRECTORY ${OUTPUT_BIN_DIRECTORY}/$<CONFIG>)
 endif ()
 include_directories(${OUTPUT_BIN_DIRECTORY})
+add_definitions(-DWIN32_LEAN_AND_MEAN=1)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(CMAKE_CXX_STANDARD 17)
