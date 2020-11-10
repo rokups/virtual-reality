@@ -56,11 +56,11 @@ stl::string from_wstring(const wchar_t* str)
 }
 
 #ifndef _WIN64
-extern "C" void free_module_exit_thread(HMODULE hModule)
+extern "C" void free_module_exit_thread(HMODULE hModule, int exit_code)
 {
     __asm
     {
-        push 0                          ; thread exit code
+        push exit_code                  ; thread exit code
         push 0C000h                     ; MEM_RELEASE | MEM_DECOMMIT
         push 0                          ; size
         push hModule                    ; module

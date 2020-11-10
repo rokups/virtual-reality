@@ -42,8 +42,12 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 
     HANDLE hMutex = mutex_lock(vr_mutant_main);
     if (!hMutex)
-        // Already running.
+    {
+        LOG_DEBUG("VR already running.");
         return 0;
+    }
+
+    LOG_DEBUG("VR runs as process %d", GetCurrentProcessId());
 
     WSADATA wsa{};
     WSAStartup(0x0202, &wsa);
@@ -60,6 +64,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     WSACleanup();
     ReleaseMutex(hMutex);
     CloseHandle(hMutex);
+    LOG_DEBUG("VR exits.");
     return 0;
 }
 

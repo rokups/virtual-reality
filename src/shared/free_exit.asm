@@ -33,7 +33,7 @@ public free_module_exit_thread
 
 free_module_exit_thread:
     sub  rsp, 20h
-    push 0                          ; thread exit code
+    push rdx                        ; thread exit code
     push 0C000h                     ; MEM_RELEASE | MEM_DECOMMIT
     push 0                          ; size
     push rcx                        ; module
